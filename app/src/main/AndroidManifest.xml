@@ -2,7 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permission for making phone calls (ACTION_DIAL doesn't require it, but good to have) -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
     <application
+        android:name=".YugvedApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

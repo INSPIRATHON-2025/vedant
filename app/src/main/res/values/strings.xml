@@ -1,3 +1,57 @@
 <resources>
-    <string name="app_name">yugved4</string>
+    <string name="app_name">Yugved</string>
+    
+    <!-- Home Fragment Strings -->
+    <string name="profile_image">Profile Image</string>
+    <string name="notifications">Notifications</string>
+    <string name="welcome_message">Welcome Back!</string>
+    <string name="tagline">Let\'s crush your fitness goals today</string>
+    <string name="daily_calories">Daily Calories</string>
+    <string name="calories_current">1,240</string>
+    <string name="of">of</string>
+    <string name="calories_goal">2,000</string>
+    <string name="kcal">kcal</string>
+    <string name="todays_workouts">Today\'s Workouts</string>
+    <string name="quick_log">Quick Log</string>
+    <string name="water">Water</string>
+    <string name="meals">Meals</string>
+    <string name="activity">Activity</string>
+    <string name="daily_mindfulness">Daily Mindfulness</string>
+    <string name="mindfulness_description">Take 5 minutes to center yourself and find inner peace</string>
+    <string name="start_session">Start Session</string>
+    
+    <!-- Workout Card Strings -->
+    <string name="workout_image">Workout Image</string>
+    <string name="duration_placeholder">20 min</string>
+    <string name="workout_title_placeholder">Morning Workout</string>
+    <string name="play_workout">Play Workout</string>
+    
+    <!-- Gym Fragment Strings -->
+    <string name="gym_workouts">Gym Workouts</string>
+    <string name="category_icon">Category Icon</string>
+    
+    
+    <!-- Exercise List Strings -->
+    <string name="no_exercises_found">No exercises found</string>
+    
+    <!-- Mental Health Module Strings -->
+    <string name="mental_health_helplines">Mental Health Helplines</string>
+    <string name="helplines_subtitle">Professional support is just a call away</string>
+    <string name="call_now">Call Now</string>
+    <string name="emergency">Emergency</string>
+    <string name="emergency_helpline">Emergency Helpline</string>
+    <string name="emergency_notice">For immediate help in a crisis, call these helplines</string>
+    
+    <!-- Yoga Module Strings -->
+    <string name="yoga_practices">Yoga Practices</string>
+    <string name="asana_icon">Asana Icon</string>
+    <string name="no_asanas_found">No asanas found</string>
+    <string name="video_placeholder">Video Placeholder</string>
+    <string name="video_coming_soon">Video Coming Soon</string>
+    <string name="benefits">Benefits</string>
+    <string name="how_to_perform">How to Perform</string>
+    <string name="step_1">1. Stand with your feet together, big toes touching, and heels slightly apart.</string>
+    <string name="step_2">2. Distribute your weight evenly through the soles of your feet.</string>
+    <string name="step_3">3. Engage your thigh muscles and lift your kneecaps. Keep your arms at your sides.</string>
+
 </resources>

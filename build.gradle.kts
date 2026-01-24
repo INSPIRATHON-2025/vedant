@@ -2,4 +2,10 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
+    
+    // Add the dependency for the Google services Gradle plugin
+    id("com.google.gms.google-services") version "4.4.4" apply false
+    
+    // Add the SafeArgs plugin dependency
+    id("androidx.navigation.safeargs.kotlin") version "2.7.6" apply false
 }

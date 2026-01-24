@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.yugved4.fragments.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/gymFragment"
+        android:name="com.example.yugved4.fragments.GymFragment"
+        android:label="Gym"
+        tools:layout="@layout/fragment_gym">
+        
+        <action
+            android:id="@+id/action_gymFragment_to_exerciseListFragment"
+            app:destination="@id/exerciseListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/yogaFragment"
+        android:name="com.example.yugved4.fragments.YogaFragment"
+        android:label="Yoga"
+        tools:layout="@layout/fragment_yoga">
+        
+        <action
+            android:id="@+id/action_yogaFragment_to_asanaListFragment"
+            app:destination="@id/asanaListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dietFragment"
+        android:name="com.example.yugved4.fragments.DietFragment"
+        android:label="Diet"
+        tools:layout="@layout/fragment_diet" />
+
+    <fragment
+        android:id="@+id/mentalHealthFragment"
+        android:name="com.example.yugved4.fragments.MentalHealthFragment"
+        android:label="Mental Health"
+        tools:layout="@layout/fragment_mental_health" />
+
+    <fragment
+        android:id="@+id/doctorFragment"
+        android:name="com.example.yugved4.fragments.DoctorFragment"
+        android:label="Doctor"
+        tools:layout="@layout/fragment_doctor" />
+
+    <!-- Exercise List Fragment -->
+    <fragment
+        android:id="@+id/exerciseListFragment"
+        android:name="com.example.yugved4.fragments.ExerciseListFragment"
+        android:label="Exercises"
+        tools:layout="@layout/fragment_exercise_list">
+        
+        <argument
+            android:name="categoryName"
+            app:argType="string" />
+    </fragment>
+
+    <!-- Asana List Fragment -->
+    <fragment
+        android:id="@+id/asanaListFragment"
+        android:name="com.example.yugved4.fragments.AsanaListFragment"
+        android:label="Asanas"
+        tools:layout="@layout/fragment_asana_list">
+        
+        <argument
+            android:name="categoryName"
+            app:argType="string" />
+            
+        <action
+            android:id="@+id/action_asanaListFragment_to_asanaDetailFragment"
+            app:destination="@id/asanaDetailFragment" />
+    </fragment>
+
+    <!-- Asana Detail Fragment -->
+    <fragment
+        android:id="@+id/asanaDetailFragment"
+        android:name="com.example.yugved4.fragments.AsanaDetailFragment"
+        android:label="Asana Details"
+        tools:layout="@layout/fragment_asana_detail">
+        
+        <argument
+            android:name="asanaId"
+            app:argType="string" />
+    </fragment>
+
+</navigation>
