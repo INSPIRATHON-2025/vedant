@@ -16,7 +16,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "yugved.db"
-        private const val DATABASE_VERSION = 5  // Incremented for helplines table
+        private const val DATABASE_VERSION = 8  // Incremented for meal_plans table
         
         // Doctors table and columns
         private const val TABLE_DOCTORS = "doctors"
@@ -52,6 +52,43 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         private const val COLUMN_HELPLINE_NAME = "name"
         private const val COLUMN_HELPLINE_NUMBER = "number"
         private const val COLUMN_HELPLINE_DESCRIPTION = "description"
+        
+        // Muscle groups table and columns
+        private const val TABLE_MUSCLE_GROUPS = "muscle_groups"
+        private const val COLUMN_MUSCLE_ID = "muscle_id"
+        private const val COLUMN_MUSCLE_NAME = "muscle_name"
+        private const val COLUMN_MUSCLE_IMAGE = "muscle_image_resource"
+        
+        // Gym exercises table and columns
+        private const val TABLE_GYM_EXERCISES = "gym_exercises"
+        private const val COLUMN_EXERCISE_ID = "exercise_id"
+        private const val COLUMN_EXERCISE_MUSCLE_ID = "muscle_id"
+        private const val COLUMN_EXERCISE_NAME = "exercise_name"
+        private const val COLUMN_EXERCISE_DESCRIPTION = "exercise_description"
+        private const val COLUMN_EXERCISE_THUMBNAIL = "thumbnail_resource"
+        
+        // Yoga asanas table and columns
+        private const val TABLE_YOGA_ASANAS = "yoga_asanas"
+        private const val COLUMN_ASANA_ID = "asana_id"
+        private const val COLUMN_ASANA_NAME = "asana_name"
+        private const val COLUMN_SANSKRIT_NAME = "sanskrit_name"
+        private const val COLUMN_ASANA_DESCRIPTION = "description"
+        private const val COLUMN_ASANA_BENEFITS = "benefits"  // Comma-separated
+        private const val COLUMN_ASANA_DURATION = "duration"
+        private const val COLUMN_ASANA_DIFFICULTY = "difficulty_level"
+        private const val COLUMN_ASANA_CATEGORY = "category"
+        private const val COLUMN_ASANA_THUMBNAIL = "thumbnail_resource"
+        
+        // Meal plans table and columns
+        private const val TABLE_MEAL_PLANS = "meal_plans"
+        private const val COLUMN_PLAN_ID = "plan_id"
+        private const val COLUMN_MIN_CALORIES = "min_calories"
+        private const val COLUMN_MAX_CALORIES = "max_calories"
+        private const val COLUMN_DIET_TYPE = "diet_type"  // 'Veg' or 'Non-Veg'
+        private const val COLUMN_BREAKFAST = "breakfast"
+        private const val COLUMN_LUNCH = "lunch"
+        private const val COLUMN_DINNER = "dinner"
+        private const val COLUMN_SNACKS = "snacks"
     }
 
     /**
@@ -105,16 +142,80 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             )
         """.trimIndent()
         
+        // Create muscle groups table
+        val createMuscleGroupsTable = """
+            CREATE TABLE $TABLE_MUSCLE_GROUPS (
+                $COLUMN_MUSCLE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COLUMN_MUSCLE_NAME TEXT NOT NULL,
+                $COLUMN_MUSCLE_IMAGE INTEGER NOT NULL
+            )
+        """.trimIndent()
+        
+        // Create gym exercises table
+        val createGymExercisesTable = """
+            CREATE TABLE $TABLE_GYM_EXERCISES (
+                $COLUMN_EXERCISE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COLUMN_EXERCISE_MUSCLE_ID INTEGER NOT NULL,
+                $COLUMN_EXERCISE_NAME TEXT NOT NULL,
+                $COLUMN_EXERCISE_DESCRIPTION TEXT NOT NULL,
+                $COLUMN_EXERCISE_THUMBNAIL INTEGER NOT NULL,
+                FOREIGN KEY($COLUMN_EXERCISE_MUSCLE_ID) REFERENCES $TABLE_MUSCLE_GROUPS($COLUMN_MUSCLE_ID)
+            )
+        """.trimIndent()
+        
         db.execSQL(createDoctorsTable)
         db.execSQL(createProfileTable)
         db.execSQL(createMentalHealthTable)
         db.execSQL(createHelplinesTable)
+        db.execSQL(createMuscleGroupsTable)
+        db.execSQL(createGymExercisesTable)
         
         // Insert seed data for mental health content
         insertMentalHealthSeedData(db)
         
         // Insert seed data for helplines
         insertHelplinesSeedData(db)
+        
+        // Create yoga asanas table
+        val createYogaAsanasTable = """
+            CREATE TABLE $TABLE_YOGA_ASANAS (
+                $COLUMN_ASANA_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COLUMN_ASANA_NAME TEXT NOT NULL,
+                $COLUMN_SANSKRIT_NAME TEXT NOT NULL,
+                $COLUMN_ASANA_DESCRIPTION TEXT NOT NULL,
+                $COLUMN_ASANA_BENEFITS TEXT NOT NULL,
+                $COLUMN_ASANA_DURATION TEXT NOT NULL,
+                $COLUMN_ASANA_DIFFICULTY TEXT NOT NULL,
+                $COLUMN_ASANA_CATEGORY TEXT NOT NULL,
+                $COLUMN_ASANA_THUMBNAIL INTEGER NOT NULL
+            )
+        """.trimIndent()
+        db.execSQL(createYogaAsanasTable)
+        
+        // Create meal plans table
+        val createMealPlansTable = """
+            CREATE TABLE $TABLE_MEAL_PLANS (
+                $COLUMN_PLAN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COLUMN_MIN_CALORIES INTEGER NOT NULL,
+                $COLUMN_MAX_CALORIES INTEGER NOT NULL,
+                $COLUMN_DIET_TYPE TEXT NOT NULL,
+                $COLUMN_BREAKFAST TEXT NOT NULL,
+                $COLUMN_LUNCH TEXT NOT NULL,
+                $COLUMN_DINNER TEXT NOT NULL,
+                $COLUMN_SNACKS TEXT NOT NULL
+            )
+        """.trimIndent()
+        db.execSQL(createMealPlansTable)
+        
+        // Insert seed data for muscle groups and exercises
+        insertMuscleGroupsSeedData(db)
+        insertGymExercisesSeedData(db)
+        
+        // Insert seed data for yoga asanas
+        insertYogaAsanasSeedData(db)
+        
+        // Insert seed data for meal plans
+        insertMealPlansSeedData(db)
     }
 
     /**
@@ -125,6 +226,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.execSQL("DROP TABLE IF EXISTS $TABLE_USER_PROFILE")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_MENTAL_HEALTH")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_HELPLINES")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_MUSCLE_GROUPS")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_GYM_EXERCISES")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_YOGA_ASANAS")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_MEAL_PLANS")
         onCreate(db)
     }
 
@@ -637,5 +742,895 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val name: String,
         val number: String,
         val description: String
+    )
+    
+    // =============== MUSCLE GROUPS & GYM EXERCISES METHODS ===============
+    
+    /**
+     * Insert seed data for muscle groups
+     * This method is called during database creation
+     */
+    private fun insertMuscleGroupsSeedData(db: SQLiteDatabase) {
+        // Note: Using placeholder icon resource ID (R.drawable.ic_activity)
+        // Replace with actual muscle group icons later
+        val iconPlaceholder = com.example.yugved4.R.drawable.ic_activity
+        
+        // Chest
+        db.execSQL("""
+            INSERT INTO $TABLE_MUSCLE_GROUPS 
+            ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
+            VALUES ('Chest', $iconPlaceholder)
+        """)
+        
+        // Back
+        db.execSQL("""
+            INSERT INTO $TABLE_MUSCLE_GROUPS 
+            ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
+            VALUES ('Back', $iconPlaceholder)
+        """)
+        
+        // Shoulders
+        db.execSQL("""
+            INSERT INTO $TABLE_MUSCLE_GROUPS 
+            ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
+            VALUES ('Shoulders', $iconPlaceholder)
+        """)
+        
+        // Arms
+        db.execSQL("""
+            INSERT INTO $TABLE_MUSCLE_GROUPS 
+            ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
+            VALUES ('Arms', $iconPlaceholder)
+        """)
+        
+        // Legs
+        db.execSQL("""
+            INSERT INTO $TABLE_MUSCLE_GROUPS 
+            ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
+            VALUES ('Legs', $iconPlaceholder)
+        """)
+        
+        // Core
+        db.execSQL("""
+            INSERT INTO $TABLE_MUSCLE_GROUPS 
+            ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
+            VALUES ('Core', $iconPlaceholder)
+        """)
+    }
+    
+    /**
+     * Insert seed data for gym exercises
+     * This method is called during database creation
+     * 
+     * Muscle Group IDs:
+     * 1 = Chest, 2 = Back, 3 = Shoulders, 4 = Arms, 5 = Legs, 6 = Core
+     */
+    private fun insertGymExercisesSeedData(db: SQLiteDatabase) {
+        val thumbnailPlaceholder = com.example.yugved4.R.drawable.ic_activity
+        
+        // ===== CHEST EXERCISES (muscle_id = 1) =====
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (1, 'Push-ups', 'Classic bodyweight chest exercise. Place hands shoulder-width apart, keep your body straight, and lower yourself until your chest nearly touches the ground. Push back up to starting position. Excellent for building upper body strength.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (1, 'Bench Press', 'Lie flat on a bench with feet firmly on the floor. Grip the barbell slightly wider than shoulder-width. Lower the bar to your mid-chest in a controlled motion, then press it back up to the starting position. Keep your shoulder blades retracted and core engaged throughout.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (1, 'Dumbbell Flyes', 'Lie on a bench holding dumbbells above your chest with palms facing each other. Lower the weights out to the sides in a wide arc with a slight bend in your elbows, feeling a stretch across your chest. Bring them back up in a hugging motion, squeezing your pecs at the top.', $thumbnailPlaceholder)
+        """)
+        
+        // ===== BACK EXERCISES (muscle_id = 2) =====
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (2, 'Lat Pulldowns', 'Sit at a lat pulldown machine and grip the bar wider than shoulder-width. Pull the bar down to your upper chest while keeping your torso upright. Squeeze your shoulder blades together at the bottom, then slowly return to the starting position. Focus on pulling with your lats, not your arms.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (2, 'Seated Row', 'Sit at a cable row machine with feet on the platform and knees slightly bent. Pull the handle to your abdomen, keeping your back straight and squeezing your shoulder blades together. Slowly extend your arms back to the starting position while maintaining tension.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (2, 'Deadlifts', 'Stand with feet hip-width apart, barbell over mid-foot. Bend at hips and knees to grip the bar with hands just outside your legs. Keep your back straight, chest up, and core tight. Lift by extending hips and knees simultaneously, keeping the bar close to your body. Lower with control.', $thumbnailPlaceholder)
+        """)
+        
+        // ===== SHOULDERS EXERCISES (muscle_id = 3) =====
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (3, 'Overhead Press', 'Stand with feet shoulder-width apart, holding dumbbells or a barbell at shoulder height. Press the weight directly overhead until arms are fully extended, keeping your core engaged. Lower back to shoulder level with control. Avoid arching your lower back.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (3, 'Lateral Raise', 'Stand holding dumbbells at your sides with palms facing inward. Raise the weights out to the sides with a slight bend in your elbows until arms are parallel to the floor. Focus on leading with your elbows. Lower slowly back to starting position, maintaining control.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (3, 'Front Raises', 'Stand holding dumbbells in front of your thighs. Raise one or both weights forward and upward to shoulder height, keeping arms straight but not locked. Slowly lower back down and repeat. This targets the front deltoids.', $thumbnailPlaceholder)
+        """)
+        
+        // ===== ARMS EXERCISES (muscle_id = 4) =====
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (4, 'Bicep Curls', 'Stand with dumbbells at your sides, palms facing forward. Curl the weights up towards your shoulders by bending at the elbows, keeping your upper arms stationary. Squeeze your biceps at the top, then slowly lower the weights back down. Avoid swinging or using momentum.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (4, 'Tricep Pushdowns', 'Stand facing a cable machine with a rope or bar attachment set at upper chest height. Grip the attachment and push down until your arms are fully extended, keeping your elbows close to your sides. Squeeze your triceps at the bottom, then slowly return to the starting position.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (4, 'Hammer Curls', 'Stand with dumbbells at your sides, palms facing each other (neutral grip). Curl the weights towards your shoulders while maintaining the neutral grip throughout. This variation targets both biceps and forearms. Lower with control.', $thumbnailPlaceholder)
+        """)
+        
+        // ===== LEGS EXERCISES (muscle_id = 5) =====
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (5, 'Squats', 'Stand with feet shoulder-width apart, toes slightly pointed out. Lower your hips as if sitting back into a chair, keeping your chest up and weight on your heels. Descend until thighs are parallel to the ground. Drive through your heels to return to standing.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (5, 'Leg Press', 'Sit in a leg press machine with feet shoulder-width apart on the platform. Release the safety handles and lower the platform by bending your knees until they reach 90 degrees. Push through your heels to extend your legs back to the starting position. Keep your back flat against the seat.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (5, 'Lunges', 'Stand with feet hip-width apart. Step forward with one leg and lower your hips until both knees are bent at approximately 90 degrees. The back knee should nearly touch the ground. Push back to the starting position through your front heel and alternate legs.', $thumbnailPlaceholder)
+        """)
+        
+        // ===== CORE EXERCISES (muscle_id = 6) =====
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (6, 'Planks', 'Start in a push-up position with forearms on the ground, elbows directly under shoulders. Keep your body in a straight line from head to heels, engaging your core, glutes, and quads. Hold this position without letting your hips sag or pike up. Breathe steadily.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (6, 'Crunches', 'Lie on your back with knees bent and feet flat on the floor. Place hands behind your head or across your chest. Lift your shoulder blades off the ground by contracting your abs, bringing your ribs toward your hips. Lower back down with control without fully relaxing.', $thumbnailPlaceholder)
+        """)
+        
+        db.execSQL("""
+            INSERT INTO $TABLE_GYM_EXERCISES 
+            ($COLUMN_EXERCISE_MUSCLE_ID, $COLUMN_EXERCISE_NAME, $COLUMN_EXERCISE_DESCRIPTION, $COLUMN_EXERCISE_THUMBNAIL) 
+            VALUES (6, 'Russian Twists', 'Sit on the floor with knees bent and feet lifted. Lean back slightly to engage your core. Hold your hands together or hold a weight. Rotate your torso from side to side, touching the ground beside your hip with each twist. Keep your core tight throughout.', $thumbnailPlaceholder)
+        """)
+    }
+    
+    /**
+     * Insert seed data for yoga asanas
+     * This method is called during database creation
+     * 
+     * 10 Asanas across difficulty levels:
+     * Beginner (3), Intermediate (4), Advanced (3)
+     */
+    private fun insertYogaAsanasSeedData(db: SQLiteDatabase) {
+        val thumbnailPlaceholder = com.example.yugved4.R.drawable.ic_yoga
+        
+        // ===== BEGINNER ASANAS (3) =====
+        
+        // 1. Tadasana (Mountain Pose)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            VALUES (
+                'Mountain Pose',
+                'Tadasana',
+                'Stand with feet together, arms at your sides. Distribute your weight evenly across both feet. Engage your thigh muscles and lift your kneecaps. Draw your shoulders back and down, lengthening through the crown of your head. This foundational pose improves posture, balance, and body awareness while strengthening the legs.',
+                'Improves posture and body awareness,Strengthens thighs knees and ankles,Firms abdomen and buttocks,Relieves sciatica,Reduces flat feet',
+                'Hold for 30-60 seconds',
+                'Beginner',
+                'Standing',
+                $thumbnailPlaceholder
+            )
+        """)
+        
+        // 2. Balasana (Child's Pose)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            VALUES (
+                'Child''s Pose',
+                'Balasana',
+                'Kneel on the floor, touch your big toes together and sit on your heels. Separate your knees about hip-width apart. Exhale and lay your torso down between your thighs. Extend your arms forward with palms facing down, or rest them alongside your body with palms up. This resting pose gently stretches the back, hips, and thighs while promoting relaxation and stress relief.',
+                'Gently stretches hips thighs and ankles,Calms the brain and relieves stress and fatigue,Relieves back and neck pain when done with head supported,Massages internal organs',
+                'Hold for 1-3 minutes',
+                'Beginner',
+                'Resting',
+                $thumbnailPlaceholder
+            )
+        """)
+        
+        // 3. Sukhasana (Easy Pose)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            VALUES (
+                'Easy Pose',
+                'Sukhasana',
+                'Sit on the floor with legs crossed. Place each foot beneath the opposite knee. Press your sitting bones down into the floor and lengthen your spine. Rest your hands on your knees with palms up or down. Relax your shoulders away from your ears. This classic meditation pose calms the mind and opens the hips.',
+                'Calms the mind and reduces stress,Strengthens the back,Stretches knees and ankles,Opens the hips,Improves posture',
+                'Hold for 5-10 minutes',
+                'Beginner',
+                'Seated',
+                $thumbnailPlaceholder
+            )
+        """)
+        
+        // ===== INTERMEDIATE ASANAS (4) =====
+        
+        // 4. Adho Mukha Svanasana (Downward-Facing Dog)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            VALUES (
+                'Downward-Facing Dog',
+                'Adho Mukha Svanasana',
+                'Start on hands and knees. Spread your fingers wide and press firmly through your palms. Tuck your toes and lift your hips up and back, forming an inverted V-shape. Keep your arms straight and press your chest toward your thighs. Work on straightening your legs and pressing your heels toward the floor. This energizing pose is one of the most recognized yoga poses.',
+                'Calms the brain and relieves stress,Energizes the body,Stretches shoulders hamstrings calves arches and hands,Strengthens arms and legs,Helps relieve headache and insomnia',
+                'Hold for 1-3 minutes',
+                'Intermediate',
+                'Inversion',
+                $thumbnailPlaceholder
+            )
+        """)
+        
+        // 5. Virabhadrasana I (Warrior I)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            VALUES (
+                'Warrior I',
+                'Virabhadrasana I',
+                'Step your right foot forward into a lunge, keeping your back leg straight and turned slightly outward. Bend your front knee to 90 degrees, ensuring it stays directly over your ankle. Square your hips to the front. Raise your arms overhead, palms facing each other. Look up toward your hands. Hold, then switch sides. This powerful pose builds strength and stamina.',
+                'Strengthens shoulders arms legs and back muscles,Opens the chest lungs shoulders and hips,Improves focus balance and stability,Stretches hip flexors,Builds stamina and endurance',
+                'Hold for 30-60 seconds per side',
+                'Intermediate',
+                'Standing',
+                $thumbnailPlaceholder
+            )
+        """)
+        
+        // 6. Trikonasana (Triangle Pose)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            VALUES (
+                'Triangle Pose',
+                'Trikonasana',
+                'Stand with feet wide apart. Turn your right foot out 90 degrees and left foot slightly in. Extend your arms parallel to the floor. Reach your right hand toward your right foot, hinging at the hip. Place your right hand on your shin, ankle, or the floor. Extend your left arm straight up. Gaze at your top hand. This pose strengthens and stretches the entire body.',
+                'Stretches legs groins hips and spine,Opens the chest and shoulders,Strengthens thighs knees and ankles,Stimulates abdominal organs,Improves balance and concentration',
+                'Hold for 30-60 seconds per side',
+                'Intermediate',
+                'Standing',
+                $thumbnailPlaceholder
+            )
+        """)
+        
+        // 7. Bhujangasana (Cobra Pose)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            VALUES (
+                'Cobra Pose',
+                'Bhujangasana',
+                'Lie face down with palms flat beside your chest. Press your hips and thighs into the floor. Inhale and straighten your arms, lifting your chest off the floor. Keep your elbows slightly bent and shoulders away from your ears. Draw your shoulder blades toward each other. Gaze slightly upward. This gentle backbend opens the chest and strengthens the spine.',
+                'Strengthens the spine and back muscles,Stretches chest shoulders and abdomen,Firms the buttocks,Stimulates abdominal organs,Relieves stress and fatigue,Opens the heart and lungs',
+                'Hold for 15-30 seconds',
+                'Intermediate',
+                'Backbend',
+                $thumbnailPlaceholder
+            )
+        """)
+        
+        // ===== ADVANCED ASANAS (3) =====
+        
+        // 8. Sirsasana (Headstand)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            VALUES (
+                'Headstand',
+                'Sirsasana',
+                'Kneel and interlace your fingers, forming a basket with your hands. Place the crown of your head on the floor inside your hands. Straighten your legs and walk your feet toward your head. Engage your core and slowly lift both legs up until perpendicular to the floor. Hold steady, distributing weight across your forearms. This is the king of asanas, requiring strength, balance, and practice. Only attempt with proper instruction.',
+                'Increases blood flow to the brain,Strengthens arms shoulders and core,Improves balance and focus,Stimulates pituitary and pineal glands,Calms the mind,Builds confidence',
+                'Hold for 10 seconds to 5 minutes gradually',
+                'Advanced',
+                'Inversion',
+                $thumbnailPlaceholder
+            )
+        """)
+        
+        // 9. Bakasana (Crow Pose)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            VALUES (
+                'Crow Pose',
+                'Bakasana',
+                'Squat with feet together. Place your palms flat on the floor, shoulder-width apart. Bend your elbows slightly and place your knees on the backs of your upper arms. Lean forward, shifting your weight onto your hands. Lift one foot off the ground, then the other. Engage your core and gaze forward. Balance on your hands. This challenging arm balance builds upper body strength and mental focus.',
+                'Strengthens arms wrists shoulders and core,Stretches the upper back,Improves balance and body awareness,Builds concentration and confidence,Tones the abdominal organs',
+                'Hold for 20-60 seconds',
+                'Advanced',
+                'Arm Balance',
+                $thumbnailPlaceholder
+            )
+        """)
+        
+        // 10. Ustrasana (Camel Pose)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            VALUES (
+                'Camel Pose',
+                'Ustrasana',
+                'Kneel with knees hip-width apart. Place your hands on your lower back, fingers pointing down. Inhale and lift your chest, arching your back. If comfortable, reach back one hand at a time to grasp your heels. Push your hips forward. Drop your head back gently if it feels comfortable for your neck. This deep backbend opens the entire front of the body and requires careful practice.',
+                'Stretches entire front of body including ankles thighs and abdomen,Improves posture and spinal flexibility,Strengthens back muscles,Stimulates organs of abdomen and neck,Reduces fat on thighs,Opens the heart chakra',
+                'Hold for 30-60 seconds',
+                'Advanced',
+                'Backbend',
+                $thumbnailPlaceholder
+            )
+        """)
+    }
+    
+    /**
+     * Insert seed data for meal plans
+     * This method is called during database creation
+     * 
+     * 14 Meal Plans covering:
+     * - 7 calorie ranges (1000-4000 kcal)
+     * - 2 diet types (Veg & Non-Veg)
+     */
+    private fun insertMealPlansSeedData(db: SQLiteDatabase) {
+        
+        // ===== 1000-1200 KCAL PLANS =====
+        
+        // 1. 1000-1200 kcal - Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                1000, 1200, 'Veg',
+                'Breakfast (250 kcal): Small bowl of oats porridge with half banana, a few almonds',
+                'Lunch (400 kcal): 1 small roti, dal (1 small bowl), steamed vegetables, small portion of brown rice',
+                'Dinner (350 kcal): Vegetable soup, 1 roti, grilled paneer (50g), cucumber salad',
+                'Snacks (150 kcal): Green tea, 1 small apple, 5-6 almonds'
+            )
+        """)
+        
+        // 2. 1000-1200 kcal - Non-Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                1000, 1200, 'Non-Veg',
+                'Breakfast (250 kcal): 1 boiled egg, 1 slice whole wheat toast, black coffee',
+                'Lunch (400 kcal): Grilled chicken breast (100g), small portion quinoa, mixed greens salad',
+                'Dinner (350 kcal): Baked fish (100g), steamed broccoli, small sweet potato',
+                'Snacks (150 kcal): Greek yogurt (100g), handful of berries'
+            )
+        """)
+        
+        // ===== 1200-1500 KCAL PLANS =====
+        
+        // 3. 1200-1500 kcal - Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                1200, 1500, 'Veg',
+                'Breakfast (300 kcal): Oats porridge with banana, honey, and 8-10 almonds',
+                'Lunch (500 kcal): 2 small rotis, rajma/chole curry, brown rice (1 bowl), mixed vegetable salad',
+                'Dinner (450 kcal): Vegetable khichdi, curd, roasted papad, cucumber raita',
+                'Snacks (200 kcal): Sprouts salad, green tea, 1 orange'
+            )
+        """)
+        
+        // 4. 1200-1500 kcal - Non-Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                1200, 1500, 'Non-Veg',
+                'Breakfast (300 kcal): 2 boiled eggs, 1 whole wheat toast, avocado (small portion)',
+                'Lunch (500 kcal): Grilled chicken (120g), quinoa bowl, roasted vegetables, olive oil dressing',
+                'Dinner (450 kcal): Fish curry, small portion rice, sautéed spinach',
+                'Snacks (200 kcal): Protein shake, apple, 10 almonds'
+            )
+        """)
+        
+        // ===== 1500-1800 KCAL PLANS =====
+        
+        // 5. 1500-1800 kcal - Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                1500, 1800, 'Veg',
+                'Breakfast (400 kcal): Poha/upma with peanuts, 1 glass milk, 1 banana',
+                'Lunch (600 kcal): 3 rotis, dal makhani, paneer sabzi, brown rice, salad, curd',
+                'Dinner (500 kcal): Vegetable biryani (1 bowl), raita, papad, mixed salad',
+                'Snacks (250 kcal): Roasted chana, fruit (apple/orange), green tea, handful of nuts'
+            )
+        """)
+        
+        // 6. 1500-1800 kcal - Non-Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                1500, 1800, 'Non-Veg',
+                'Breakfast (400 kcal): 2 eggs (scrambled), 2 slices whole grain toast, orange juice',
+                'Lunch (600 kcal): Chicken tikka (150g), brown rice, dal, mixed vegetables, salad',
+                'Dinner (500 kcal): Grilled fish/prawns, quinoa, steamed broccoli, tomato soup',
+                'Snacks (250 kcal): Whey protein shake, banana, peanut butter (1 tbsp)'
+            )
+        """)
+        
+        // ===== 1800-2000 KCAL PLANS =====
+        
+        // 7. 1800-2000 kcal - Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                1800, 2000, 'Veg',
+                'Breakfast (450 kcal): Paratha (2), curd, pickle, 1 glass milk/chai',
+                'Lunch (650 kcal): 3 rotis, rajma/chole, paneer curry, rice, salad, buttermilk',
+                'Dinner (550 kcal): Dal, 2 rotis, mix veg sabzi, curd, salad',
+                'Snacks (300 kcal): Smoothie with fruits and nuts, roasted makhana, green tea'
+            )
+        """)
+        
+        // 8. 1800-2000 kcal - Non-Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                1800, 2000, 'Non-Veg',
+                'Breakfast (450 kcal): 3 eggs omelette, 2 toast slices, avocado, orange juice',
+                'Lunch (650 kcal): Chicken curry (150g), 2 rotis, rice, dal, salad, curd',
+                'Dinner (550 kcal): Grilled fish, sweet potato, mixed vegetables, soup',
+                'Snacks (300 kcal): Protein bar, banana, handful of mixed nuts, green tea'
+            )
+        """)
+        
+        // ===== 2000-2500 KCAL PLANS =====
+        
+        // 9. 2000-2500 kcal - Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                2000, 2500, 'Veg',
+                'Breakfast (500 kcal): 2 parathas with curd, pickle, 1 glass milk, banana',
+                'Lunch (800 kcal): 4 rotis, dal makhani, paneer butter masala, rice, salad, raita, papad',
+                'Dinner (650 kcal): Vegetable pulao, dal, raita, paneer tikka, salad',
+                'Snacks (400 kcal): Smoothie bowl with fruits and nuts, sandwich, tea/coffee'
+            )
+        """)
+        
+        // 10. 2000-2500 kcal - Non-Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                2000, 2500, 'Non-Veg',
+                'Breakfast (500 kcal): 3 eggs, 3 toast slices, avocado, bacon (2 strips), juice',
+                'Lunch (800 kcal): Chicken biryani (large bowl), raita, boiled eggs (2), salad',
+                'Dinner (650 kcal): Grilled chicken (200g), brown rice, mixed vegetables, dal',
+                'Snacks (400 kcal): Whey shake, peanut butter sandwich, fruits, almonds'
+            )
+        """)
+        
+        // ===== 2500-3000 KCAL PLANS =====
+        
+        // 11. 2500-3000 kcal - Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                2500, 3000, 'Veg',
+                'Breakfast (600 kcal): 3 parathas, curd, paneer bhurji, milk, fruits',
+                'Lunch (950 kcal): 5 rotis, chole/rajma, paneer curry, rice (2 bowls), salad, raita, dessert',
+                'Dinner (750 kcal): Dal makhani, 3 rotis, veg pulao, paneer tikka, salad, curd',
+                'Snacks (500 kcal): Dry fruits smoothie, sandwich, pakoras, tea, fruits'
+            )
+        """)
+        
+        // 12. 2500-3000 kcal - Non-Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                2500, 3000, 'Non-Veg',
+                'Breakfast (600 kcal): 4 eggs, 3 toast, bacon, avocado, protein shake',
+                'Lunch (950 kcal): Chicken curry (250g), 3 rotis, rice (2 bowls), dal, eggs, salad',
+                'Dinner (750 kcal): Grilled fish/chicken (250g), pasta, vegetables, soup',
+                'Snacks (500 kcal): Mass gainer shake, chicken sandwich, fruits, nuts, protein bar'
+            )
+        """)
+        
+        // ===== 3000-4000 KCAL PLANS =====
+        
+        // 13. 3000-4000 kcal - Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                3000, 4000, 'Veg',
+                'Breakfast (750 kcal): 4 parathas, paneer bhurji, curd, milk, dry fruits, banana',
+                'Lunch (1200 kcal): 6 rotis, rajma/chole, paneer butter masala, rice (3 bowls), salad, raita, sweet dish',
+                'Dinner (900 kcal): Veg biryani (large), dal makhani, paneer tikka, raita, salad, dessert',
+                'Snacks (700 kcal): Mass gainer shake, sandwich, pakoras, dry fruits, smoothie, tea'
+            )
+        """)
+        
+        // 14. 3000-4000 kcal - Non-Vegetarian
+        db.execSQL("""
+            INSERT INTO $TABLE_MEAL_PLANS 
+            ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
+            VALUES (
+                3000, 4000, 'Non-Veg',
+                'Breakfast (750 kcal): 5 eggs, 4 toast, bacon, cheese, avocado, protein shake, juice',
+                'Lunch (1200 kcal): Chicken biryani (xl), 3 boiled eggs, chicken tikka, raita, salad',
+                'Dinner (900 kcal): Grilled chicken/fish (300g), rice (2 bowls), pasta, vegetables, soup',
+                'Snacks (700 kcal): Mass gainer shake (2), chicken sandwich, fruits, nuts, protein bars (2)'
+            )
+        """)
+    }
+    
+    /**
+     * Get all muscle groups from database
+     * @return List of MuscleGroup objects
+     */
+    fun getAllMuscleGroups(): List<com.example.yugved4.models.MuscleGroup> {
+        val muscleGroupList = mutableListOf<com.example.yugved4.models.MuscleGroup>()
+        val db = readableDatabase
+        
+        db.rawQuery("SELECT * FROM $TABLE_MUSCLE_GROUPS", null).use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MUSCLE_ID))
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MUSCLE_NAME))
+                    val imageResource = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MUSCLE_IMAGE))
+                    
+                    muscleGroupList.add(
+                        com.example.yugved4.models.MuscleGroup(
+                            id = id,
+                            name = name,
+                            imageResource = imageResource
+                        )
+                    )
+                } while (cursor.moveToNext())
+            }
+        }
+        
+        db.close()
+        return muscleGroupList
+    }
+    
+    /**
+     * Get exercises by muscle ID using RAW SQL query
+     * @param muscleId The ID of the muscle group
+     * @return List of GymExercise objects
+     */
+    fun getExercisesByMuscleId(muscleId: Int): List<GymExercise> {
+        val exerciseList = mutableListOf<GymExercise>()
+        val db = readableDatabase
+        
+        // Raw SQL query with WHERE clause
+        val query = "SELECT * FROM $TABLE_GYM_EXERCISES WHERE $COLUMN_EXERCISE_MUSCLE_ID = ?"
+        
+        db.rawQuery(query, arrayOf(muscleId.toString())).use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_ID))
+                    val exerciseMuscleId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_MUSCLE_ID))
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_NAME))
+                    val description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_DESCRIPTION))
+                    val thumbnail = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_THUMBNAIL))
+                    
+                    exerciseList.add(
+                        GymExercise(
+                            id = id,
+                            muscleId = exerciseMuscleId,
+                            name = name,
+                            description = description,
+                            thumbnailResource = thumbnail
+                        )
+                    )
+                } while (cursor.moveToNext())
+            }
+        }
+        
+        db.close()
+        return exerciseList
+    }
+    
+    /**
+     * Get exercise detail by exercise ID
+     * @param exerciseId The ID of the exercise
+     * @return GymExercise object or null if not found
+     */
+    fun getExerciseDetail(exerciseId: Int): GymExercise? {
+        val db = readableDatabase
+        var exercise: GymExercise? = null
+        
+        val query = "SELECT * FROM $TABLE_GYM_EXERCISES WHERE $COLUMN_EXERCISE_ID = ?"
+        
+        db.rawQuery(query, arrayOf(exerciseId.toString())).use { cursor ->
+            if (cursor.moveToFirst()) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_ID))
+                val muscleId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_MUSCLE_ID))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_NAME))
+                val description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_DESCRIPTION))
+                val thumbnail = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_THUMBNAIL))
+                
+                exercise = GymExercise(
+                    id = id,
+                    muscleId = muscleId,
+                    name = name,
+                    description = description,
+                    thumbnailResource = thumbnail
+                )
+            }
+        }
+        db.close()
+        return exercise
+    }
+    
+    // =====================================================
+    // YOGA ASANAS QUERY METHODS
+    // =====================================================
+    
+    /**
+     * Data class representing a yoga asana from database
+     */
+    data class YogaAsana(
+        val id: Int,
+        val name: String,
+        val sanskritName: String,
+        val description: String,
+        val benefits: List<String>,  // Parsed from comma-separated string
+        val duration: String,
+        val difficultyLevel: String,
+        val category: String,
+        val thumbnailResource: Int
+    )
+    
+    /**
+     * Get all yoga asanas from database
+     * @return List of YogaAsana objects
+     */
+    fun getAllYogaAsanas(): List<YogaAsana> {
+        val asanaList = mutableListOf<YogaAsana>()
+        val db = readableDatabase
+        
+        db.rawQuery("SELECT * FROM $TABLE_YOGA_ASANAS ORDER BY $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_NAME", null).use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ASANA_ID))
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_NAME))
+                    val sanskritName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SANSKRIT_NAME))
+                    val description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_DESCRIPTION))
+                    val benefitsString = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_BENEFITS))
+                    val benefits = benefitsString.split(",").map { it.trim() }  // Parse comma-separated benefits
+                    val duration = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_DURATION))
+                    val difficultyLevel = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_DIFFICULTY))
+                    val category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_CATEGORY))
+                    val thumbnailResource = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ASANA_THUMBNAIL))
+                    
+                    asanaList.add(
+                        YogaAsana(id, name, sanskritName, description, benefits, duration, difficultyLevel, category, thumbnailResource)
+                    )
+                } while (cursor.moveToNext())
+            }
+        }
+        
+        db.close()
+        return asanaList
+    }
+    
+    /**
+     * Get yoga asanas filtered by category
+     * @param category Category to filter by (e.g., "Beginner", "Intermediate", "Advanced")
+     * @return List of YogaAsana objects matching the category
+     */
+    fun getAsanasByCategory(category: String): List<YogaAsana> {
+        val asanaList = mutableListOf<YogaAsana>()
+        val db = readableDatabase
+        
+        // Query with WHERE clause filtering by difficulty level
+        val query = "SELECT * FROM $TABLE_YOGA_ASANAS WHERE $COLUMN_ASANA_DIFFICULTY = ? ORDER BY $COLUMN_ASANA_NAME"
+        
+        db.rawQuery(query, arrayOf(category)).use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ASANA_ID))
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_NAME))
+                    val sanskritName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SANSKRIT_NAME))
+                    val description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_DESCRIPTION))
+                    val benefitsString = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_BENEFITS))
+                    val benefits = benefitsString.split(",").map { it.trim() }
+                    val duration = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_DURATION))
+                    val difficultyLevel = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_DIFFICULTY))
+                    val categoryValue = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_CATEGORY))
+                    val thumbnailResource = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ASANA_THUMBNAIL))
+                    
+                    asanaList.add(
+                        YogaAsana(id, name, sanskritName, description, benefits, duration, difficultyLevel, categoryValue, thumbnailResource)
+                    )
+                } while (cursor.moveToNext())
+            }
+        }
+        
+        db.close()
+        return asanaList
+    }
+    
+    /**
+     * Get specific yoga asana by ID
+     * @param asanaId ID of the asana
+     * @return YogaAsana object or null if not found
+     */
+    fun getAsanaById(asanaId: Int): YogaAsana? {
+        val db = readableDatabase
+        var asana: YogaAsana? = null
+        
+        // Query with WHERE clause filtering by asana_id
+        val query = "SELECT * FROM $TABLE_YOGA_ASANAS WHERE $COLUMN_ASANA_ID = ?"
+        
+        db.rawQuery(query, arrayOf(asanaId.toString())).use { cursor ->
+            if (cursor.moveToFirst()) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ASANA_ID))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_NAME))
+                val sanskritName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SANSKRIT_NAME))
+                val description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_DESCRIPTION))
+                val benefitsString = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_BENEFITS))
+                val benefits = benefitsString.split(",").map { it.trim() }
+                val duration = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_DURATION))
+                val difficultyLevel = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_DIFFICULTY))
+                val category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_CATEGORY))
+                val thumbnailResource = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ASANA_THUMBNAIL))
+                
+                asana = YogaAsana(id, name, sanskritName, description, benefits, duration, difficultyLevel, category, thumbnailResource)
+            }
+        }
+        
+        db.close()
+        return asana
+    }
+
+    // =====================================================
+    // MEAL PLANS QUERY METHODS
+    // =====================================================
+    
+    /**
+     * Data class representing a meal plan from database
+     */
+    data class MealPlan(
+        val id: Int,
+        val minCalories: Int,
+        val maxCalories: Int,
+        val dietType: String,
+        val breakfast: String,
+        val lunch: String,
+        val dinner: String,
+        val snacks: String
+    )
+    
+    /**
+     * Get meal plan based on calorie target and diet type
+     * Uses BETWEEN operator for range matching
+     * @param targetCalories The user's calculated calorie requirement
+     * @param dietType Diet preference ('Veg' or 'Non-Veg')
+     * @return MealPlan object or null if no match found
+     */
+    fun getMealPlan(targetCalories: Int, dietType: String): MealPlan? {
+        val db = readableDatabase
+        var plan: MealPlan? = null
+        
+        // Primary query: Find plan where targetCalories falls within the range
+        val query = """
+            SELECT * FROM $TABLE_MEAL_PLANS 
+            WHERE ? BETWEEN $COLUMN_MIN_CALORIES AND $COLUMN_MAX_CALORIES 
+            AND $COLUMN_DIET_TYPE = ?
+            ORDER BY $COLUMN_PLAN_ID LIMIT 1
+        """
+        
+        db.rawQuery(query, arrayOf(targetCalories.toString(), dietType)).use { cursor ->
+            if (cursor.moveToFirst()) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_PLAN_ID))
+                val minCal = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MIN_CALORIES))
+                val maxCal = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MAX_CALORIES))
+                val type = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DIET_TYPE))
+                val breakfast = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BREAKFAST))
+                val lunch = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LUNCH))
+                val dinner = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DINNER))
+                val snacks = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SNACKS))
+                
+                plan = MealPlan(id, minCal, maxCal, type, breakfast, lunch, dinner, snacks)
+            }
+        }
+        
+        // Fallback: If no exact match, find closest plan
+        if (plan == null) {
+            val fallbackQuery = if (targetCalories < 1000) {
+                // If below minimum, return lowest calorie plan
+                """
+                    SELECT * FROM $TABLE_MEAL_PLANS 
+                    WHERE $COLUMN_DIET_TYPE = ?
+                    ORDER BY $COLUMN_MIN_CALORIES ASC LIMIT 1
+                """
+            } else {
+                // If above maximum, return highest calorie plan
+                """
+                    SELECT * FROM $TABLE_MEAL_PLANS 
+                    WHERE $COLUMN_DIET_TYPE = ?
+                    ORDER BY $COLUMN_MAX_CALORIES DESC LIMIT 1
+                """
+            }
+            
+            db.rawQuery(fallbackQuery, arrayOf(dietType)).use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_PLAN_ID))
+                    val minCal = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MIN_CALORIES))
+                    val maxCal = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MAX_CALORIES))
+                    val type = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DIET_TYPE))
+                    val breakfast = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BREAKFAST))
+                    val lunch = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LUNCH))
+                    val dinner = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DINNER))
+                    val snacks = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SNACKS))
+                    
+                    plan = MealPlan(id, minCal, maxCal, type, breakfast, lunch, dinner, snacks)
+                }
+            }
+        }
+        
+        db.close()
+        return plan
+    }
+
+    // =====================================================
+    // DOCTOR PROFILE METHODS
+    // =====================================================
+    
+    /**
+     * Data class for Gym Exercise
+     */
+    data class GymExercise(
+        val id: Int,
+        val muscleId: Int,
+        val name: String,
+        val description: String,
+        val thumbnailResource: Int
     )
 }

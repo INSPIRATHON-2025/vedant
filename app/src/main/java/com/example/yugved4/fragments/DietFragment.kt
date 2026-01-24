@@ -26,16 +26,22 @@ class DietFragment : Fragment() {
     
     private lateinit var prefsManager: DietPreferencesManager
     
-    // Step 1 views
+    // Step 1 views - Activity Level
     private var actvActivityLevel: AutoCompleteTextView? = null
     private var selectedActivityLevel: String = ""
     
-    // Step 2 views
+    // Step 2 views - Fitness Goal
+    private var cardWeightLoss: MaterialCardView? = null
+    private var cardMaintainWeight: MaterialCardView? = null
+    private var cardWeightGain: MaterialCardView? = null
+    private var selectedFitnessGoal: String = ""
+    
+    // Step 3 views - Diet Preference
     private var cardVegetarian: MaterialCardView? = null
     private var cardNonVeg: MaterialCardView? = null
     private var selectedDietPreference: String = ""
     
-    // Step 3 views
+    // Step 4 views - Body Metrics
     private var etAge: TextInputEditText? = null
     private var rgGender: RadioGroup? = null
     private var etHeight: TextInputEditText? = null
@@ -64,9 +70,10 @@ class DietFragment : Fragment() {
     }
 
     private fun setupViewPager() {
-        // Create the 3 step views
+        // Create the 4 step views
         val stepViews = listOf(
             createActivityLevelView(),
+            createFitnessGoalView(),
             createDietPreferenceView(),
             createBodyMetricsView()
         )
@@ -78,7 +85,7 @@ class DietFragment : Fragment() {
             
             override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {}
             
-            override fun getItemCount(): Int = 3
+            override fun getItemCount(): Int = 4
             
             override fun getItemViewType(position: Int): Int = position
         }
@@ -112,6 +119,31 @@ class DietFragment : Fragment() {
         
         actvActivityLevel?.setOnItemClickListener { _, _, position, _ ->
             selectedActivityLevel = activityLevels[position]
+        }
+        
+        return view
+    }
+
+    private fun createFitnessGoalView(): View {
+        val view = layoutInflater.inflate(R.layout.step_fitness_goal, viewPager, false)
+        
+        cardWeightLoss = view.findViewById(R.id.cardWeightLoss)
+        cardMaintainWeight = view.findViewById(R.id.cardMaintainWeight)
+        cardWeightGain = view.findViewById(R.id.cardWeightGain)
+        
+        cardWeightLoss?.setOnClickListener {
+            selectedFitnessGoal = "Weight Loss"
+            updateFitnessGoalCards()
+        }
+        
+        cardMaintainWeight?.setOnClickListener {
+            selectedFitnessGoal = "Maintain Weight"
+            updateFitnessGoalCards()
+        }
+        
+        cardWeightGain?.setOnClickListener {
+            selectedFitnessGoal = "Weight Gain"
+            updateFitnessGoalCards()
         }
         
         return view
@@ -154,6 +186,15 @@ class DietFragment : Fragment() {
         cardVegetarian?.strokeColor = if (selectedDietPreference == "Vegetarian") emeraldGreen else lightGray
         cardNonVeg?.strokeColor = if (selectedDietPreference == "Non-Veg") emeraldGreen else lightGray
     }
+    
+    private fun updateFitnessGoalCards() {
+        val emeraldGreen = resources.getColor(R.color.emerald_green, null)
+        val lightGray = resources.getColor(R.color.background_light, null)
+        
+        cardWeightLoss?.strokeColor = if (selectedFitnessGoal == "Weight Loss") emeraldGreen else lightGray
+        cardMaintainWeight?.strokeColor = if (selectedFitnessGoal == "Maintain Weight") emeraldGreen else lightGray
+        cardWeightGain?.strokeColor = if (selectedFitnessGoal == "Weight Gain") emeraldGreen else lightGray
+    }
 
     private fun setupButtons() {
         btnPrevious.setOnClickListener {
@@ -164,7 +205,7 @@ class DietFragment : Fragment() {
         
         btnNext.setOnClickListener {
             if (validateCurrentStep()) {
-                if (currentStep < 2) {
+                if (currentStep < 3) {
                     viewPager.currentItem = currentStep + 1
                 } else {
                     // Calculate and navigate to result
@@ -179,15 +220,16 @@ class DietFragment : Fragment() {
     private fun updateUI() {
         // Update step indicator
         tvStepIndicator.text = when (currentStep) {
-            0 -> getString(R.string.step_1_of_3)
-            1 -> getString(R.string.step_2_of_3)
-            2 -> getString(R.string.step_3_of_3)
+            0 -> "Step 1 of 4"
+            1 -> "Step 2 of 4"
+            2 -> "Step 3 of 4"
+            3 -> "Step 4 of 4"
             else -> ""
         }
         
         // Update button visibility and text
         btnPrevious.visibility = if (currentStep > 0) View.VISIBLE else View.GONE
-        btnNext.text = if (currentStep == 2) getString(R.string.calculate) else getString(R.string.next)
+        btnNext.text = if (currentStep == 3) getString(R.string.calculate) else getString(R.string.next)
     }
 
     private fun validateCurrentStep(): Boolean {
@@ -199,12 +241,18 @@ class DietFragment : Fragment() {
                 } else true
             }
             1 -> {
+                if (selectedFitnessGoal.isEmpty()) {
+                    Toast.makeText(requireContext(), "Please select your fitness goal", Toast.LENGTH_SHORT).show()
+                    false
+                } else true
+            }
+            2 -> {
                 if (selectedDietPreference.isEmpty()) {
                     Toast.makeText(requireContext(), "Please select your dietary preference", Toast.LENGTH_SHORT).show()
                     false
                 } else true
             }
-            2 -> validateBodyMetrics()
+            3 -> validateBodyMetrics()
             else -> true
         }
     }
@@ -277,15 +325,17 @@ class DietFragment : Fragment() {
         // Save to SharedPreferences
         prefsManager.saveDietData(dietData)
         
-        // Navigate to result fragment
+        // Navigate to result fragment with calories and diet type
         val bundle = Bundle().apply {
             putInt("calories", calories)
+            putString("dietType", if (selectedDietPreference == "Vegetarian") "Veg" else "Non-Veg")
         }
         findNavController().navigate(R.id.action_dietFragment_to_dietResultFragment, bundle)
     }
 
     /**
      * Calculate daily calorie requirements using Mifflin-St Jeor formula
+     * Adjusts based on fitness goal
      */
     private fun calculateCalories(age: Int, gender: String, height: Int, weight: Float, activityLevel: String): Int {
         // Calculate BMR (Basal Metabolic Rate)
@@ -305,6 +355,15 @@ class DietFragment : Fragment() {
             else -> 1.2
         }
         
-        return (bmr * multiplier).toInt()
+        // Calculate maintenance calories (TDEE)
+        val maintenanceCalories = (bmr * multiplier).toInt()
+        
+        // Adjust based on fitness goal
+        return when (selectedFitnessGoal) {
+            "Weight Loss" -> maintenanceCalories - 500  // Calorie deficit for weight loss
+            "Weight Gain" -> maintenanceCalories + 500  // Calorie surplus for weight gain
+            "Maintain Weight" -> maintenanceCalories     // No adjustment for maintenance
+            else -> maintenanceCalories
+        }
     }
 }

@@ -4,29 +4,32 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.yugved4.R
-import com.example.yugved4.utils.DietPreferencesManager
+import com.example.yugved4.database.DatabaseHelper
+import com.google.android.material.button.MaterialButton
 
 /**
- * Diet Result Fragment - Displays calculated calorie goal and user summary
+ * Diet Result Fragment - Displays meal plan from database based on calorie requirements
+ * Updated to use SQL database with getMealPlan() query
  */
 class DietResultFragment : Fragment() {
 
     private lateinit var tvCaloriesValue: TextView
-    private lateinit var tvActivityLevelValue: TextView
-    private lateinit var tvDietPrefValue: TextView
-    private lateinit var tvAgeGenderValue: TextView
-    private lateinit var tvHeightValue: TextView
-    private lateinit var tvWeightValue: TextView
-    private lateinit var btnGenerateMealPlan: Button
-    private lateinit var btnRecalculate: Button
+    private lateinit var tvCalorieRange: TextView
+    private lateinit var tvDietTypeValue: TextView
+    private lateinit var tvBreakfast: TextView
+    private lateinit var tvLunch: TextView
+    private lateinit var tvDinner: TextView
+    private lateinit var tvSnacks: TextView
+    private lateinit var btnRecalculate: MaterialButton
     
-    private lateinit var prefsManager: DietPreferencesManager
+    private lateinit var dbHelper: DatabaseHelper
+    private var targetCalories: Int = 0
+    private var dietType: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,16 +38,20 @@ class DietResultFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_diet_result, container, false)
         
-        prefsManager = DietPreferencesManager(requireContext())
+        dbHelper = DatabaseHelper(requireContext())
+        
+        // Get arguments from navigation
+        targetCalories = arguments?.getInt("calories") ?: 2000
+        dietType = arguments?.getString("dietType") ?: "Veg"
         
         // Initialize views
         tvCaloriesValue = view.findViewById(R.id.tvCaloriesValue)
-        tvActivityLevelValue = view.findViewById(R.id.tvActivityLevelValue)
-        tvDietPrefValue = view.findViewById(R.id.tvDietPrefValue)
-        tvAgeGenderValue = view.findViewById(R.id.tvAgeGenderValue)
-        tvHeightValue = view.findViewById(R.id.tvHeightValue)
-        tvWeightValue = view.findViewById(R.id.tvWeightValue)
-        btnGenerateMealPlan = view.findViewById(R.id.btnGenerateMealPlan)
+        tvCalorieRange = view.findViewById(R.id.tvCalorieRange)
+        tvDietTypeValue = view.findViewById(R.id.tvDietTypeValue)
+        tvBreakfast = view.findViewById(R.id.tvBreakfast)
+        tvLunch = view.findViewById(R.id.tvLunch)
+        tvDinner = view.findViewById(R.id.tvDinner)
+        tvSnacks = view.findViewById(R.id.tvSnacks)
         btnRecalculate = view.findViewById(R.id.btnRecalculate)
         
         return view
@@ -53,36 +60,52 @@ class DietResultFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        loadAndDisplayData()
+        loadAndDisplayMealPlan()
         setupButtons()
     }
 
-    private fun loadAndDisplayData() {
-        val dietData = prefsManager.loadDietData()
+    /**
+     * Fetch meal plan from database and display it
+     */
+    private fun loadAndDisplayMealPlan() {
+        // Query database for meal plan
+        val mealPlan = dbHelper.getMealPlan(targetCalories, dietType)
         
-        if (dietData != null) {
-            // Display calorie value
-            tvCaloriesValue.text = dietData.calculatedCalories.toString()
+        if (mealPlan != null) {
+            // Display calorie information
+            tvCaloriesValue.text = "$targetCalories kcal"
+            tvCalorieRange.text = "Plan Range: ${mealPlan.minCalories}-${mealPlan.maxCalories} kcal"
+            tvDietTypeValue.text = "Diet Type: ${mealPlan.dietType}"
             
-            // Display user details
-            tvActivityLevelValue.text = dietData.activityLevel
-            tvDietPrefValue.text = dietData.dietPreference
-            tvAgeGenderValue.text = "${dietData.age} years, ${dietData.gender}"
-            tvHeightValue.text = "${dietData.height} cm"
-            tvWeightValue.text = String.format("%.1f kg", dietData.weight)
-        }
-    }
-
-    private fun setupButtons() {
-        btnGenerateMealPlan.setOnClickListener {
-            // Placeholder for future meal plan generation
+            // Display meal plan details
+            tvBreakfast.text = mealPlan.breakfast
+            tvLunch.text = mealPlan.lunch
+            tvDinner.text = mealPlan.dinner
+            tvSnacks.text = mealPlan.snacks
+            
+        } else {
+            // Fallback if no plan found (should not happen due to fallback logic in getMealPlan)
+            tvCaloriesValue.text = "$targetCalories kcal"
+            tvCalorieRange.text = "No plan available"
+            tvDietTypeValue.text = "Diet Type: $dietType"
+            
+            tvBreakfast.text = "Unable to load meal plan"
+            tvLunch.text = "Please try recalculating"
+            tvDinner.text = "Or contact support"
+            tvSnacks.text = "-"
+            
             Toast.makeText(
                 requireContext(),
-                "Meal plan generation coming soon!",
+                "No meal plan found for these parameters",
                 Toast.LENGTH_SHORT
             ).show()
         }
-        
+    }
+
+    /**
+     * Setup button click listeners
+     */
+    private fun setupButtons() {
         btnRecalculate.setOnClickListener {
             // Navigate back to diet survey
             findNavController().popBackStack()

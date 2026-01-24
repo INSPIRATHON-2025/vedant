@@ -53,14 +53,11 @@ class YogaFragment : Fragment() {
      */
     private fun setupRecyclerView() {
         categoryAdapter = CategoryAdapter(categories) { category ->
-            // NOTE: YogaFragment is deprecated - use WorkoutFragment instead
-            // This fragment kept for reference but navigation removed
-            // Navigate to AsanaListFragment with category name
+            // Navigate to AsanaListFragment with difficulty level category
             val bundle = Bundle().apply {
                 putString("categoryName", category.name)
             }
-            // TODO: This navigation no longer works - YogaFragment removed from nav_graph
-            // findNavController().navigate(R.id.action_yogaFragment_to_asanaListFragment, bundle)
+            findNavController().navigate(R.id.action_yogaFragment_to_asanaListFragment, bundle)
         }
 
         binding.rvCategories.apply {

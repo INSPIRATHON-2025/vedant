@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.yugved4.R
-import com.example.yugved4.models.YogaAsana
-import com.example.yugved4.utils.YogaDataProvider
+import com.example.yugved4.database.DatabaseHelper
 import com.google.android.material.chip.Chip
 
 /**
  * Fragment displaying detailed information about a specific yoga asana
+ * Updated to use SQL database instead of YogaDataProvider
  */
 class AsanaDetailFragment : Fragment() {
 
@@ -23,9 +23,10 @@ class AsanaDetailFragment : Fragment() {
     private lateinit var chipDuration: Chip
     private lateinit var chipDifficulty: Chip
     private lateinit var chipCategory: Chip
+    private lateinit var dbHelper: DatabaseHelper
     
-    private var asanaId: String = ""
-    private var asana: YogaAsana? = null
+    private var asanaId: Int = 0
+    private var asana: DatabaseHelper.YogaAsana? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,8 +35,8 @@ class AsanaDetailFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_asana_detail, container, false)
         
-        // Get asana ID from arguments
-        asanaId = arguments?.getString("asanaId") ?: ""
+        // Get asana ID from arguments (now expecting integer)
+        asanaId = arguments?.getInt("asanaId") ?: 0
         
         // Initialize views
         tvSanskritName = view.findViewById(R.id.tvSanskritName)
@@ -52,15 +53,18 @@ class AsanaDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        dbHelper = DatabaseHelper(requireContext())
+        
         loadAsanaData()
         displayAsanaDetails()
     }
 
     /**
-     * Load asana data by ID
+     * Load asana data from database by ID
      */
     private fun loadAsanaData() {
-        asana = YogaDataProvider.getAsanaById(asanaId)
+        // Fetch from database using SQL query
+        asana = dbHelper.getAsanaById(asanaId)
     }
 
     /**

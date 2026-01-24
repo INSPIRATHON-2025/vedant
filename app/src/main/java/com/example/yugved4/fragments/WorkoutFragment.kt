@@ -63,17 +63,13 @@ class WorkoutFragment : Fragment() {
     }
     
     /**
-     * Navigate to Gym categories (shows GymFragment content)
+     * Navigate to Gym categories (shows muscle group selection)
      */
     private fun navigateToGymCategories() {
         try {
-            // Navigate to exercise list with "Gym" category using Bundle
-            val bundle = Bundle().apply {
-                putString("categoryName", "Gym")
-            }
+            // Navigate to GymCategoriesFragment to show muscle group selection
             findNavController().navigate(
-                R.id.action_workoutFragment_to_exerciseListFragment,
-                bundle
+                R.id.action_workoutFragment_to_gymCategoriesFragment
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -81,17 +77,13 @@ class WorkoutFragment : Fragment() {
     }
     
     /**
-     * Navigate to Yoga asanas (shows YogaFragment content)
+     * Navigate to Yoga categories (shows difficulty level selection)
      */
     private fun navigateToYogaAsanas() {
         try {
-            // Navigate to asana list with "Yoga" category using Bundle
-            val bundle = Bundle().apply {
-                putString("categoryName", "Yoga")
-            }
+            // Navigate to YogaFragment to show category selection
             findNavController().navigate(
-                R.id.action_workoutFragment_to_asanaListFragment,
-                bundle
+                R.id.action_workoutFragment_to_yogaFragment
             )
         } catch (e: Exception) {
             e.printStackTrace()

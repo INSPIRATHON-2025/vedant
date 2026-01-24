@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Video Placeholder -->
+        <FrameLayout
+            android:id="@+id/videoPlaceholder"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:background="#424242">
+
+            <!-- TODO: Replace with VideoView/ExoPlayer when video files are provided -->
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_play_circle"
+                android:contentDescription="Video placeholder"
+                app:tint="@android:color/white"
+                android:alpha="0.7" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="80dp"
+                android:text="Video Coming Soon"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:alpha="0.7" />
+
+        </FrameLayout>
+
+        <!-- Exercise Title -->
+        <TextView
+            android:id="@+id/tvExerciseTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:text="Push-ups"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <!-- Section: How to Perform -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="8dp"
+            android:text="How to Perform"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary" />
+
+        <!-- Exercise Description -->
+        <TextView
+            android:id="@+id/tvExerciseDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:paddingTop="8dp"
+            android:text="Classic bodyweight chest exercise. Place hands shoulder-width apart, keep your body straight, and lower yourself until your chest nearly touches the ground. Push back up to starting position."
+            android:textSize="16sp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="?android:attr/textColorSecondary" />
+
+    </LinearLayout>
+
+</ScrollView>

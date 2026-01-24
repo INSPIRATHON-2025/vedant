@@ -11,11 +11,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yugved4.R
 import com.example.yugved4.adapters.AsanaAdapter
+import com.example.yugved4.database.DatabaseHelper
 import com.example.yugved4.models.YogaAsana
-import com.example.yugved4.utils.YogaDataProvider
 
 /**
- * Fragment displaying a list of yoga asanas filtered by category
+ * Fragment displaying a list of yoga asanas filtered by category (difficulty level)
+ * Updated to use SQL database instead of YogaDataProvider
  */
 class AsanaListFragment : Fragment() {
 
@@ -23,6 +24,7 @@ class AsanaListFragment : Fragment() {
     private lateinit var tvCategoryHeader: TextView
     private lateinit var tvEmptyState: TextView
     private lateinit var asanaAdapter: AsanaAdapter
+    private lateinit var dbHelper: DatabaseHelper
     
     private var categoryName: String = ""
     private val asanas = mutableListOf<YogaAsana>()
@@ -34,7 +36,7 @@ class AsanaListFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_asana_list, container, false)
         
-        // Get category name from arguments
+        // Get category name from arguments (difficulty level: Beginner, Intermediate, Advanced)
         categoryName = arguments?.getString("categoryName") ?: ""
         
         // Initialize views
@@ -48,17 +50,38 @@ class AsanaListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        dbHelper = DatabaseHelper(requireContext())
+        
         loadAsanas()
         setupRecyclerView()
         updateUI()
     }
 
     /**
-     * Load asanas filtered by category
+     * Load asanas from database filtered by difficulty level (category)
      */
     private fun loadAsanas() {
         asanas.clear()
-        asanas.addAll(YogaDataProvider.getAsanasByCategory(categoryName))
+        
+        // Fetch from database using SQL query
+        val asanasFromDb = dbHelper.getAsanasByCategory(categoryName)
+        
+        // Convert DatabaseHelper.YogaAsana to models.YogaAsana
+        asanasFromDb.forEach { dbAsana ->
+            asanas.add(
+                YogaAsana(
+                    asanaId = dbAsana.id.toString(),  // Convert Int to String for compatibility
+                    name = dbAsana.name,
+                    sanskritName = dbAsana.sanskritName,
+                    difficultyLevel = dbAsana.difficultyLevel,
+                    videoUrl = "placeholder",  // Not stored in database yet
+                    description = dbAsana.description,
+                    benefits = dbAsana.benefits,
+                    duration = dbAsana.duration,
+                    category = dbAsana.category
+                )
+            )
+        }
     }
 
     /**
@@ -68,7 +91,7 @@ class AsanaListFragment : Fragment() {
         asanaAdapter = AsanaAdapter(asanas) { asana ->
             // Navigate to AsanaDetailFragment with asana ID
             val bundle = Bundle().apply {
-                putString("asanaId", asana.asanaId)
+                putInt("asanaId", asana.asanaId.toInt())  // Pass as integer for database query
             }
             findNavController().navigate(R.id.action_asanaListFragment_to_asanaDetailFragment, bundle)
         }

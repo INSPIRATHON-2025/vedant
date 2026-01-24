@@ -4,23 +4,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.yugved4.adapters.ExerciseAdapter
+import com.example.yugved4.R
+import com.example.yugved4.adapters.SimpleExerciseAdapter
+import com.example.yugved4.database.DatabaseHelper
 import com.example.yugved4.databinding.FragmentExerciseListBinding
-import com.example.yugved4.models.Exercise
 
 /**
- * Exercise List Fragment displaying exercises for a specific category
+ * Exercise List Fragment displaying exercises for a specific muscle group
+ * Uses SQL database to fetch exercises based on muscleId
  */
 class ExerciseListFragment : Fragment() {
 
     private var _binding: FragmentExerciseListBinding? = null
     private val binding get() = _binding!!
     
-    private lateinit var exerciseAdapter: ExerciseAdapter
-    private val exercises = mutableListOf<Exercise>()
+    private lateinit var exerciseAdapter: SimpleExerciseAdapter
+    private lateinit var dbHelper: DatabaseHelper
+    private val exercises = mutableListOf<DatabaseHelper.GymExercise>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,108 +37,31 @@ class ExerciseListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        // Get category name from arguments
-        val categoryName = arguments?.getString("categoryName") ?: "Unknown"
-        binding.tvCategoryHeader.text = "$categoryName Exercises"
+        dbHelper = DatabaseHelper(requireContext())
         
-        loadExercises(categoryName)
+        // Get muscle ID and name from arguments
+        val muscleId = arguments?.getInt("muscleId") ?: 1
+        val muscleName = arguments?.getString("muscleName") ?: "Unknown"
+        
+        // Update header
+        binding.tvMuscleName.text = muscleName
+        
+        loadExercises(muscleId)
         setupRecyclerView()
     }
 
     /**
-     * Load exercises based on category (dummy data for now)
+     * Load exercises from database using RAW SQL query
      */
-    private fun loadExercises(categoryName: String) {
+    private fun loadExercises(muscleId: Int) {
         exercises.clear()
         
-        // Add dummy exercises based on category
-        when (categoryName) {
-            "Chest" -> {
-                exercises.add(
-                    Exercise(
-                        exerciseId = "1",
-                        name = "Push-ups",
-                        targetMuscles = listOf("Chest", "Triceps", "Shoulders"),
-                        difficultyLevel = "Beginner",
-                        videoUrl = "https://example.com/pushups",
-                        description = "Classic push-up exercise",
-                        category = "Chest",
-                        duration = "3 sets x 12 reps",
-                        caloriesBurned = 50
-                    )
-                )
-                exercises.add(
-                    Exercise(
-                        exerciseId = "2",
-                        name = "Bench Press",
-                        targetMuscles = listOf("Chest", "Triceps"),
-                        difficultyLevel = "Intermediate",
-                        videoUrl = "https://example.com/benchpress",
-                        description = "Barbell bench press",
-                        category = "Chest",
-                        duration = "4 sets x 10 reps",
-                        caloriesBurned = 80
-                    )
-                )
-                exercises.add(
-                    Exercise(
-                        exerciseId = "3",
-                        name = "Dumbbell Flyes",
-                        targetMuscles = listOf("Chest"),
-                        difficultyLevel = "Intermediate",
-                        videoUrl = "https://example.com/flyes",
-                        description = "Dumbbell chest flyes",
-                        category = "Chest",
-                        duration = "3 sets x 12 reps",
-                        caloriesBurned = 60
-                    )
-                )
-            }
-            "Back" -> {
-                exercises.add(
-                    Exercise(
-                        exerciseId = "4",
-                        name = "Pull-ups",
-                        targetMuscles = listOf("Back", "Biceps"),
-                        difficultyLevel = "Intermediate",
-                        videoUrl = "https://example.com/pullups",
-                        description = "Classic pull-up exercise",
-                        category = "Back",
-                        duration = "3 sets x 8 reps",
-                        caloriesBurned = 70
-                    )
-                )
-                exercises.add(
-                    Exercise(
-                        exerciseId = "5",
-                        name = "Bent-over Rows",
-                        targetMuscles = listOf("Back", "Biceps"),
-                        difficultyLevel = "Intermediate",
-                        videoUrl = "https://example.com/rows",
-                        description = "Barbell bent-over rows",
-                        category = "Back",
-                        duration = "4 sets x 10 reps",
-                        caloriesBurned = 75
-                    )
-                )
-            }
-            else -> {
-                // Generic exercises for other categories
-                exercises.add(
-                    Exercise(
-                        exerciseId = "100",
-                        name = "$categoryName Exercise 1",
-                        targetMuscles = listOf(categoryName),
-                        difficultyLevel = "Beginner",
-                        videoUrl = "https://example.com/exercise",
-                        description = "Sample exercise for $categoryName",
-                        category = categoryName,
-                        duration = "3 sets x 12 reps",
-                        caloriesBurned = 50
-                    )
-                )
-            }
-        }
+        // Fetch exercises from database using SELECT * FROM exercises WHERE muscle_id = ?
+        val exercisesFromDb = dbHelper.getExercisesByMuscleId(muscleId)
+        exercises.addAll(exercisesFromDb)
+        
+        // Update exercise count
+        binding.tvExerciseCount.text = "${exercises.size} Exercises"
         
         // Show empty state if no exercises
         if (exercises.isEmpty()) {
@@ -151,13 +77,15 @@ class ExerciseListFragment : Fragment() {
      * Setup RecyclerView with exercises
      */
     private fun setupRecyclerView() {
-        exerciseAdapter = ExerciseAdapter(exercises) { exercise ->
-            // Handle exercise click (will implement details later)
-            Toast.makeText(
-                requireContext(),
-                "Clicked: ${exercise.name}",
-                Toast.LENGTH_SHORT
-            ).show()
+        exerciseAdapter = SimpleExerciseAdapter(exercises) { exercise ->
+            // Navigate to ExerciseDetailFragment with exerciseId
+            val bundle = Bundle().apply {
+                putInt("exerciseId", exercise.id)
+            }
+            findNavController().navigate(
+                R.id.action_exerciseListFragment_to_exerciseDetailFragment,
+                bundle
+            )
         }
 
         binding.rvExercises.apply {

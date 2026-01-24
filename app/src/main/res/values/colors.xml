@@ -28,4 +28,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="whatsapp_green">#25D366</color>
+    
+    <!-- UI Interaction Colors -->
+    <color name="ripple_color">#20000000</color>
 </resources>

@@ -24,6 +24,14 @@
         <action
             android:id="@+id/action_workoutFragment_to_asanaListFragment"
             app:destination="@id/asanaListFragment" />
+            
+        <action
+            android:id="@+id/action_workoutFragment_to_gymCategoriesFragment"
+            app:destination="@id/gymCategoriesFragment" />
+            
+        <action
+            android:id="@+id/action_workoutFragment_to_yogaFragment"
+            app:destination="@id/yogaFragment" />
     </fragment>
 
 
@@ -56,16 +64,52 @@
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
 
-    <!-- Exercise List Fragment -->
+    <!-- Gym Categories Fragment (Step 1: Muscle Group Selection) -->
+    <fragment
+        android:id="@+id/gymCategoriesFragment"
+        android:name="com.example.yugved4.fragments.GymCategoriesFragment"
+        android:label="Gym"
+        tools:layout="@layout/fragment_gym_categories">
+        
+        <action
+            android:id="@+id/action_gymCategoriesFragment_to_exerciseListFragment"
+            app:destination="@id/exerciseListFragment" />
+    </fragment>
+
+    <!-- Exercise List Fragment (Step 2: Exercise List) -->
     <fragment
         android:id="@+id/exerciseListFragment"
         android:name="com.example.yugved4.fragments.ExerciseListFragment"
         android:label="Exercises"
         tools:layout="@layout/fragment_exercise_list">
         
+        <!-- Updated arguments for muscle-based filtering -->
         <argument
-            android:name="categoryName"
-            app:argType="string" />
+            android:name="muscleId"
+            app:argType="integer"
+            android:defaultValue="1" />
+            
+        <argument
+            android:name="muscleName"
+            app:argType="string"
+            android:defaultValue="Chest" />
+        
+        <action
+            android:id="@+id/action_exerciseListFragment_to_exerciseDetailFragment"
+            app:destination="@id/exerciseDetailFragment" />
+    </fragment>
+
+    <!-- Exercise Detail Fragment (Step 3: Exercise Detail) -->
+    <fragment
+        android:id="@+id/exerciseDetailFragment"
+        android:name="com.example.yugved4.fragments.ExerciseDetailFragment"
+        android:label="Exercise Details"
+        tools:layout="@layout/fragment_exercise_detail">
+        
+        <argument
+            android:name="exerciseId"
+            app:argType="integer"
+            android:defaultValue="1" />
     </fragment>
 
     <!-- Asana List Fragment -->
@@ -93,7 +137,8 @@
         
         <argument
             android:name="asanaId"
-            app:argType="string" />
+            app:argType="integer"
+            android:defaultValue="1" />
     </fragment>
 
     <!-- Diet Result Fragment -->
@@ -102,5 +147,17 @@
         android:name="com.example.yugved4.fragments.DietResultFragment"
         android:label="Diet Results"
         tools:layout="@layout/fragment_diet_result" />
+    
+    <!-- Yoga Categories Fragment -->
+    <fragment
+        android:id="@+id/yogaFragment"
+        android:name="com.example.yugved4.fragments.YogaFragment"
+        android:label="Yoga Categories"
+        tools:layout="@layout/fragment_yoga">
+        
+        <action
+            android:id="@+id/action_yogaFragment_to_asanaListFragment"
+            app:destination="@id/asanaListFragment" />
+    </fragment>
 
 </navigation>
