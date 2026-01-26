@@ -139,18 +139,8 @@ class StepFragment : Fragment(), SensorEventListener {
      */
     private fun setupProfileButton() {
         // Load Google profile photo into button
-        val currentUser = auth.currentUser
-        val photoUrl = currentUser?.photoUrl
-        
-        if (photoUrl != null) {
-            Glide.with(this)
-                .load(photoUrl)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.ic_profile)
-                .error(R.drawable.ic_profile)
-                .circleCrop()
-                .into(binding.btnProfile)
-        }
+        // Profile button now just shows default icon (defined in XML)
+        // Photo loading removed as per user request (show photo only in menu)
         
         // Set click listener to show profile bottom sheet
         binding.btnProfile.setOnClickListener {

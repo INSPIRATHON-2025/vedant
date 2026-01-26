@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp">
+
+    <!-- Question Title -->
+    <TextView
+        android:id="@+id/tvQuestion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Which gender do you identify with?"
+        android:textColor="@color/text_primary"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Description -->
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="This helps us calculate your metabolic rate accurately"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvQuestion" />
+
+    <!-- Gender Selection Group -->
+    <RadioGroup
+        android:id="@+id/rgGender"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDescription">
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/rbMale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_gender_option"
+            android:button="@null"
+            android:drawableEnd="?android:attr/listChoiceIndicatorSingle"
+            android:padding="16dp"
+            android:text="Male"
+            android:textSize="16sp" />
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/rbFemale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_gender_option"
+            android:button="@null"
+            android:drawableEnd="?android:attr/listChoiceIndicatorSingle"
+            android:padding="16dp"
+            android:text="Female"
+            android:textSize="16sp" />
+
+    </RadioGroup>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

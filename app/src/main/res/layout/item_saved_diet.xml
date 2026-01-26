@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_activity"
+                app:tint="@color/emerald_green" />
+
+            <TextView
+                android:id="@+id/tvCalories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="2000 kcal Plan"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/black" />
+                
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+                
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Veg"
+                android:clickable="false"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Saved on: Jan 24, 2026"
+            android:textColor="@color/gray_600"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

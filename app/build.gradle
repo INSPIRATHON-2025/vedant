@@ -8,6 +8,7 @@ plugins {
 android {
     namespace 'com.example.yugved4'
     compileSdk 34
+    buildToolsVersion "34.0.0"
 
     defaultConfig {
         applicationId "com.example.yugved4"

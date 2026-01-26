@@ -11,6 +11,7 @@ import com.example.yugved4.database.DatabaseHelper
 import com.example.yugved4.databinding.ActivityOnboardingBinding
 import com.example.yugved4.databinding.StepOnboardingAgeBinding
 import com.example.yugved4.databinding.StepOnboardingBodyBinding
+import com.example.yugved4.databinding.StepOnboardingGenderBinding
 import com.example.yugved4.databinding.StepOnboardingGoalBinding
 import com.example.yugved4.databinding.StepOnboardingNameBinding
 import com.example.yugved4.utils.AuthHelper
@@ -24,10 +25,11 @@ class OnboardingActivity : AppCompatActivity() {
     private lateinit var dbHelper: DatabaseHelper
     
     private var currentStep = 0
-    private val totalSteps = 4
+    private val totalSteps = 5
     
     // Data storage
     private var userName: String = ""
+    private var userGender: String = "Male" // Default
     private var userAge: Int = 0
     private var userHeight: Double = 0.0
     private var userWeight: Double = 0.0
@@ -109,10 +111,24 @@ class OnboardingActivity : AppCompatActivity() {
         // Show appropriate step
         when (currentStep) {
             0 -> showNameStep()
-            1 -> showAgeStep()
-            2 -> showBodyStep()
-            3 -> showGoalStep()
+            1 -> showGenderStep()
+            2 -> showAgeStep()
+            3 -> showBodyStep()
+            4 -> showGoalStep()
         }
+    }
+
+    private fun showGenderStep() {
+        val stepBinding = StepOnboardingGenderBinding.inflate(LayoutInflater.from(this))
+        
+        if (userGender == "Male") {
+            stepBinding.rbMale.isChecked = true
+        } else {
+            stepBinding.rbFemale.isChecked = true
+        }
+        
+        binding.stepContainer.removeAllViews()
+        binding.stepContainer.addView(stepBinding.root)
     }
 
     private fun showNameStep() {
@@ -181,6 +197,10 @@ class OnboardingActivity : AppCompatActivity() {
                 }
             }
             1 -> {
+                // Gender step - always valid as one is selected by default or user selects one
+                true
+            }
+            2 -> {
                 val view = binding.stepContainer.getChildAt(0)
                 val ageBinding = StepOnboardingAgeBinding.bind(view)
                 val ageText = ageBinding.etAge.text.toString().trim()
@@ -198,7 +218,7 @@ class OnboardingActivity : AppCompatActivity() {
                     }
                 }
             }
-            2 -> {
+            3 -> {
                 val view = binding.stepContainer.getChildAt(0)
                 val bodyBinding = StepOnboardingBodyBinding.bind(view)
                 val heightText = bodyBinding.etHeight.text.toString().trim()
@@ -222,7 +242,7 @@ class OnboardingActivity : AppCompatActivity() {
                     }
                 }
             }
-            3 -> {
+            4 -> {
                 val view = binding.stepContainer.getChildAt(0)
                 val goalBinding = StepOnboardingGoalBinding.bind(view)
                 val checkedChipId = goalBinding.chipGroupGoals.checkedChipId
@@ -261,16 +281,21 @@ class OnboardingActivity : AppCompatActivity() {
             }
             1 -> {
                 val view = binding.stepContainer.getChildAt(0)
+                val genderBinding = StepOnboardingGenderBinding.bind(view)
+                userGender = if (genderBinding.rbMale.isChecked) "Male" else "Female"
+            }
+            2 -> {
+                val view = binding.stepContainer.getChildAt(0)
                 val ageBinding = StepOnboardingAgeBinding.bind(view)
                 userAge = ageBinding.etAge.text.toString().toInt()
             }
-            2 -> {
+            3 -> {
                 val view = binding.stepContainer.getChildAt(0)
                 val bodyBinding = StepOnboardingBodyBinding.bind(view)
                 userHeight = bodyBinding.etHeight.text.toString().toDouble()
                 userWeight = bodyBinding.etWeight.text.toString().toDouble()
             }
-            3 -> {
+            4 -> {
                 val view = binding.stepContainer.getChildAt(0)
                 val goalBinding = StepOnboardingGoalBinding.bind(view)
                 val checkedChipId = goalBinding.chipGroupGoals.checkedChipId
@@ -297,7 +322,15 @@ class OnboardingActivity : AppCompatActivity() {
         // Calculate target calories (simple BMR calculation)
         // Using Mifflin-St Jeor formula: BMR = 10*weight + 6.25*height - 5*age + 5 (for male, -161 for female)
         // For simplicity, we'll use the male formula as default
-        val bmr = (10 * userWeight) + (6.25 * userHeight) - (5 * userAge) + 5
+        // Using Mifflin-St Jeor formula:
+        // Male: 10*weight + 6.25*height - 5*age + 5
+        // Female: 10*weight + 6.25*height - 5*age - 161
+        val bmr = if (userGender == "Male") {
+            (10 * userWeight) + (6.25 * userHeight) - (5 * userAge) + 5
+        } else {
+            (10 * userWeight) + (6.25 * userHeight) - (5 * userAge) - 161
+        }
+        
         val targetCalories = (bmr * 1.375).toInt() // Light activity multiplier
 
         // Save to local database (this must succeed)
@@ -306,6 +339,7 @@ class OnboardingActivity : AppCompatActivity() {
                 targetCalories = targetCalories,
                 currentWeight = userWeight,
                 age = userAge,
+                gender = userGender,
                 height = userHeight,
                 name = userName,
                 firebaseUid = currentUser.uid
@@ -327,6 +361,7 @@ class OnboardingActivity : AppCompatActivity() {
                 val userData = mapOf(
                     "name" to userName,
                     "age" to userAge,
+                    "gender" to userGender,
                     "height" to userHeight,
                     "weight" to userWeight,
                     "stepGoal" to stepGoal,

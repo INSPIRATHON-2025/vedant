@@ -2,6 +2,7 @@ package com.example.yugved4.utils
 
 import android.util.Log
 import com.example.yugved4.models.Doctor
+import com.example.yugved4.models.UserDietPlan
 import com.example.yugved4.models.UserProfile
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -263,6 +264,71 @@ object FirestoreHelper {
             Log.d(TAG, "Doctor deleted from Firestore: $doctorId")
         } catch (e: Exception) {
             Log.e(TAG, "Error deleting doctor from Firestore", e)
+        }
+    }
+    /**
+     * Save user diet plan to Firestore
+     * @param uid Firebase user ID
+     * @param dietPlan The diet plan to save
+     */
+    suspend fun saveDietPlan(uid: String, dietPlan: UserDietPlan) {
+        try {
+            val dietPlanData = hashMapOf(
+                "userId" to uid,
+                "targetCalories" to dietPlan.targetCalories,
+                "dietType" to dietPlan.dietType,
+                "breakfast" to dietPlan.breakfast,
+                "lunch" to dietPlan.lunch,
+                "dinner" to dietPlan.dinner,
+                "snacks" to dietPlan.snacks,
+                "timestamp" to FieldValue.serverTimestamp()
+            )
+            
+            db.collection(COLLECTION_USERS)
+                .document(uid)
+                .collection("diet_plans")
+                .add(dietPlanData)
+                .await()
+                
+            Log.d(TAG, "Diet plan saved to Firestore for user: $uid")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error saving diet plan to Firestore", e)
+            throw e
+        }
+    }
+    /**
+     * Get all saved diet plans for a user
+     * @param uid Firebase user ID
+     * @return List of UserDietPlan objects
+     */
+    suspend fun getUserDietPlans(uid: String): List<UserDietPlan> {
+        return try {
+            val snapshot = db.collection(COLLECTION_USERS)
+                .document(uid)
+                .collection("diet_plans")
+                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .get()
+                .await()
+                
+            val plans = mutableListOf<UserDietPlan>()
+            for (doc in snapshot.documents) {
+                val plan = UserDietPlan(
+                    id = doc.id,
+                    userId = doc.getString("userId") ?: "",
+                    timestamp = doc.getTimestamp("timestamp")?.toDate()?.time ?: 0L,
+                    targetCalories = doc.getLong("targetCalories")?.toInt() ?: 0,
+                    dietType = doc.getString("dietType") ?: "",
+                    breakfast = doc.getString("breakfast") ?: "",
+                    lunch = doc.getString("lunch") ?: "",
+                    dinner = doc.getString("dinner") ?: "",
+                    snacks = doc.getString("snacks") ?: ""
+                )
+                plans.add(plan)
+            }
+            plans
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching diet plans", e)
+            emptyList()
         }
     }
 }

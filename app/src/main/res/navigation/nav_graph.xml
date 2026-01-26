@@ -36,15 +36,56 @@
     </fragment>
 
 
+    <!-- Diet Options Fragment (Entry Point) -->
     <fragment
         android:id="@+id/dietFragment"
+        android:name="com.example.yugved4.fragments.DietOptionsFragment"
+        android:label="Diet Options"
+        tools:layout="@layout/fragment_diet_options">
+
+        <action
+            android:id="@+id/action_dietFragment_to_dietSurveyFragment"
+            app:destination="@id/dietSurveyFragment" />
+
+        <action
+            android:id="@+id/action_dietFragment_to_savedDietListFragment"
+            app:destination="@id/savedDietListFragment" />
+    </fragment>
+
+    <!-- Diet Survey Fragment (Renamed from dietFragment) -->
+    <fragment
+        android:id="@+id/dietSurveyFragment"
         android:name="com.example.yugved4.fragments.DietFragment"
-        android:label="Diet"
+        android:label="Diet Survey"
         tools:layout="@layout/fragment_diet_survey">
         
         <action
             android:id="@+id/action_dietFragment_to_dietResultFragment"
             app:destination="@id/dietResultFragment" />
+    </fragment>
+    
+    <!-- Saved Diet List Fragment -->
+    <fragment
+        android:id="@+id/savedDietListFragment"
+        android:name="com.example.yugved4.fragments.SavedDietListFragment"
+        android:label="Saved Plans"
+        tools:layout="@layout/fragment_saved_diet_list">
+        
+        <action
+            android:id="@+id/action_savedDietListFragment_to_savedDietDetailFragment"
+            app:destination="@id/savedDietDetailFragment" />
+    </fragment>
+    
+    <!-- Saved Diet Detail Fragment -->
+    <fragment
+        android:id="@+id/savedDietDetailFragment"
+        android:name="com.example.yugved4.fragments.SavedDietDetailFragment"
+        android:label="Plan Details"
+        tools:layout="@layout/fragment_saved_diet_detail">
+        
+        <argument
+            android:name="dietPlanId"
+            app:argType="string" />
     </fragment>
 
     <fragment

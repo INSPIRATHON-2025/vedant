@@ -1,12 +1,12 @@
 package com.example.yugved4.fragments
 
-import android.animation.ValueAnimator
+
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
+
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -15,8 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yugved4.R
 import com.example.yugved4.adapters.HelplineCardAdapter
+import com.example.yugved4.utils.AuthHelper
 import com.example.yugved4.database.DatabaseHelper
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.android.material.textfield.TextInputEditText
+import java.util.Date
 
 /**
  * Mental Health Fragment - Complete mental wellness toolkit
@@ -28,8 +33,7 @@ class MentalHealthFragment : Fragment() {
     private lateinit var dbHelper: DatabaseHelper
     
     // UI Components
-    private lateinit var tvDailyQuote: TextView
-    private lateinit var breathingCircle: View
+
     private lateinit var btnToggleAudio: MaterialButton
     private lateinit var btnMood1: Button
     private lateinit var btnMood2: Button
@@ -37,8 +41,14 @@ class MentalHealthFragment : Fragment() {
     private lateinit var btnMood4: Button
     private lateinit var btnMood5: Button
     
-    // Breathing animation
-    private var breathingAnimator: ValueAnimator? = null
+    private lateinit var etJournalEntry: TextInputEditText
+    private lateinit var btnSaveJournal: MaterialButton
+    private lateinit var btnViewHistory: MaterialButton
+    
+    private var selectedMood: Int = 0
+    private var selectedMoodDescription: String = ""
+    
+
     
     // Audio player
     private var mediaPlayer: MediaPlayer? = null
@@ -55,8 +65,7 @@ class MentalHealthFragment : Fragment() {
         dbHelper = DatabaseHelper(requireContext())
 
         // Initialize views
-        tvDailyQuote = view.findViewById(R.id.tvDailyQuote)
-        breathingCircle = view.findViewById(R.id.breathingCircle)
+
         btnToggleAudio = view.findViewById(R.id.btnToggleAudio)
         btnMood1 = view.findViewById(R.id.btnMood1)
         btnMood2 = view.findViewById(R.id.btnMood2)
@@ -64,18 +73,28 @@ class MentalHealthFragment : Fragment() {
         btnMood4 = view.findViewById(R.id.btnMood4)
         btnMood5 = view.findViewById(R.id.btnMood5)
         
+        etJournalEntry = view.findViewById(R.id.etJournalEntry)
+        btnSaveJournal = view.findViewById(R.id.btnSaveJournal)
+        btnViewHistory = view.findViewById(R.id.btnViewHistory)
+        
+        btnSaveJournal.setOnClickListener {
+            saveJournalEntry()
+        }
+        
+        btnViewHistory.setOnClickListener {
+            showJournalHistory()
+        }
+        
         // Initialize RecyclerView
         rvHelplines = view.findViewById(R.id.rvHelplines)
         setupRecyclerView()
         
-        // Load random quote
-        loadDailyQuote()
+
         
         // Setup mood buttons
         setupMoodTracking()
         
-        // Setup breathing animation
-        setupBreathingAnimation()
+
         
         // Setup audio player (only if audio file exists)
         setupAudioPlayer()
@@ -83,13 +102,7 @@ class MentalHealthFragment : Fragment() {
         return view
     }
     
-    /**
-     * Load a random quote from database and display it
-     */
-    private fun loadDailyQuote() {
-        val quote = dbHelper.getRandomQuote()
-        tvDailyQuote.text = "\"$quote\""
-    }
+
     
     /**
      * Setup mood tracking buttons
@@ -105,34 +118,97 @@ class MentalHealthFragment : Fragment() {
     /**
      * Save mood to database and show feedback
      */
+    /**
+     * Save mood locally and update UI selection
+     */
     private fun saveMood(score: Int, description: String) {
-        val success = dbHelper.saveDailyMood(score)
+        selectedMood = score
+        selectedMoodDescription = description
         
-        if (success) {
-            Toast.makeText(requireContext(), "Mood saved: $description", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(requireContext(), "Failed to save mood", Toast.LENGTH_SHORT).show()
-        }
+        // Visual feedback for selection (reset others first)
+        resetMoodButtons()
+        highlightSelectedMood(score)
+        
+        Toast.makeText(requireContext(), "Mood selected: $description", Toast.LENGTH_SHORT).show()
     }
     
-    /**
-     * Setup breathing animation with smooth inhale/exhale cycle
-     */
-    private fun setupBreathingAnimation() {
-        breathingAnimator = ValueAnimator.ofFloat(1.0f, 1.5f, 1.0f).apply {
-            duration = 8000 // 4 seconds inhale + 4 seconds exhale
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = AccelerateDecelerateInterpolator()
-            
-            addUpdateListener { animation ->
-                val scale = animation.animatedValue as Float
-                breathingCircle.scaleX = scale
-                breathingCircle.scaleY = scale
-            }
-            
-            start()
+    private fun resetMoodButtons() {
+        val defaultAlpha = 0.5f
+        btnMood1.alpha = defaultAlpha
+        btnMood2.alpha = defaultAlpha
+        btnMood3.alpha = defaultAlpha
+        btnMood4.alpha = defaultAlpha
+        btnMood5.alpha = defaultAlpha
+    }
+    
+    private fun highlightSelectedMood(score: Int) {
+        val selectedAlpha = 1.0f
+        when(score) {
+            1 -> btnMood1.alpha = selectedAlpha
+            2 -> btnMood2.alpha = selectedAlpha
+            3 -> btnMood3.alpha = selectedAlpha
+            4 -> btnMood4.alpha = selectedAlpha
+            5 -> btnMood5.alpha = selectedAlpha
         }
     }
+
+    private fun showJournalHistory() {
+        val bottomSheet = JournalHistoryBottomSheet()
+        bottomSheet.show(parentFragmentManager, JournalHistoryBottomSheet.TAG)
+    }
+
+    private fun saveJournalEntry() {
+        val content = etJournalEntry.text.toString().trim()
+        
+        if (selectedMood == 0) {
+            Toast.makeText(requireContext(), "Please select a mood first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        if (content.isEmpty()) {
+            Toast.makeText(requireContext(), "Please write your thoughts", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        val userId = AuthHelper.getCurrentUserId()
+        if (userId == null) {
+            Toast.makeText(requireContext(), "Please sign in to save journal", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // Prepare data
+        val journalEntry = hashMapOf(
+            "mood" to selectedMood,
+            "moodDescription" to selectedMoodDescription,
+            "content" to content,
+            "date" to Date(),
+            "userId" to userId
+        )
+        
+        // Show loading state
+        btnSaveJournal.isEnabled = false
+        btnSaveJournal.text = "Saving..."
+        
+        // Save to Firestore
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .collection("journal")
+            .add(journalEntry)
+            .addOnSuccessListener {
+                Toast.makeText(requireContext(), "Journal saved successfully", Toast.LENGTH_SHORT).show()
+                etJournalEntry.text?.clear()
+                btnSaveJournal.isEnabled = true
+                btnSaveJournal.text = "Save Entry"
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Failed to save: ${e.message}", Toast.LENGTH_SHORT).show()
+                btnSaveJournal.isEnabled = true
+                btnSaveJournal.text = "Save Entry"
+            }
+    }
+    
+
     
     /**
      * Setup audio player for relaxation sounds
@@ -230,9 +306,7 @@ class MentalHealthFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         
-        // Clean up breathing animation
-        breathingAnimator?.cancel()
-        breathingAnimator = null
+
         
         // Clean up media player
         mediaPlayer?.apply {

@@ -11,6 +11,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.yugved4.R
 import com.example.yugved4.models.UserDietData
 import com.example.yugved4.utils.DietPreferencesManager
+import com.example.yugved4.database.DatabaseHelper
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
 
@@ -25,6 +26,7 @@ class DietFragment : Fragment() {
     private lateinit var btnNext: Button
     
     private lateinit var prefsManager: DietPreferencesManager
+    private lateinit var dbHelper: DatabaseHelper
     
     // Step 1 views - Activity Level
     private var actvActivityLevel: AutoCompleteTextView? = null
@@ -41,12 +43,6 @@ class DietFragment : Fragment() {
     private var cardNonVeg: MaterialCardView? = null
     private var selectedDietPreference: String = ""
     
-    // Step 4 views - Body Metrics
-    private var etAge: TextInputEditText? = null
-    private var rgGender: RadioGroup? = null
-    private var etHeight: TextInputEditText? = null
-    private var etWeight: TextInputEditText? = null
-    
     private var currentStep = 0
 
     override fun onCreateView(
@@ -57,6 +53,7 @@ class DietFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_diet_survey, container, false)
         
         prefsManager = DietPreferencesManager(requireContext())
+        dbHelper = DatabaseHelper(requireContext())
         
         viewPager = view.findViewById(R.id.viewPagerSteps)
         tvStepIndicator = view.findViewById(R.id.tvStepIndicator)
@@ -74,8 +71,7 @@ class DietFragment : Fragment() {
         val stepViews = listOf(
             createActivityLevelView(),
             createFitnessGoalView(),
-            createDietPreferenceView(),
-            createBodyMetricsView()
+            createDietPreferenceView()
         )
         
         val adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
@@ -85,7 +81,7 @@ class DietFragment : Fragment() {
             
             override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {}
             
-            override fun getItemCount(): Int = 4
+            override fun getItemCount(): Int = 3
             
             override fun getItemViewType(position: Int): Int = position
         }
@@ -168,17 +164,6 @@ class DietFragment : Fragment() {
         return view
     }
 
-    private fun createBodyMetricsView(): View {
-        val view = layoutInflater.inflate(R.layout.step_body_metrics, viewPager, false)
-        
-        etAge = view.findViewById(R.id.etAge)
-        rgGender = view.findViewById(R.id.rgGender)
-        etHeight = view.findViewById(R.id.etHeight)
-        etWeight = view.findViewById(R.id.etWeight)
-        
-        return view
-    }
-
     private fun updateDietPreferenceCards() {
         val emeraldGreen = resources.getColor(R.color.emerald_green, null)
         val lightGray = resources.getColor(R.color.background_light, null)
@@ -205,7 +190,7 @@ class DietFragment : Fragment() {
         
         btnNext.setOnClickListener {
             if (validateCurrentStep()) {
-                if (currentStep < 3) {
+                if (currentStep < 2) {
                     viewPager.currentItem = currentStep + 1
                 } else {
                     // Calculate and navigate to result
@@ -220,16 +205,15 @@ class DietFragment : Fragment() {
     private fun updateUI() {
         // Update step indicator
         tvStepIndicator.text = when (currentStep) {
-            0 -> "Step 1 of 4"
-            1 -> "Step 2 of 4"
-            2 -> "Step 3 of 4"
-            3 -> "Step 4 of 4"
+            0 -> "Step 1 of 3"
+            1 -> "Step 2 of 3"
+            2 -> "Step 3 of 3"
             else -> ""
         }
         
         // Update button visibility and text
         btnPrevious.visibility = if (currentStep > 0) View.VISIBLE else View.GONE
-        btnNext.text = if (currentStep == 3) getString(R.string.calculate) else getString(R.string.next)
+        btnNext.text = if (currentStep == 2) getString(R.string.calculate) else getString(R.string.next)
     }
 
     private fun validateCurrentStep(): Boolean {
@@ -252,63 +236,23 @@ class DietFragment : Fragment() {
                     false
                 } else true
             }
-            3 -> validateBodyMetrics()
             else -> true
         }
     }
 
-    private fun validateBodyMetrics(): Boolean {
-        val ageText = etAge?.text.toString()
-        val heightText = etHeight?.text.toString()
-        val weightText = etWeight?.text.toString()
-        val selectedGenderId = rgGender?.checkedRadioButtonId ?: -1
-        
-        when {
-            ageText.isEmpty() -> {
-                Toast.makeText(requireContext(), getString(R.string.please_enter_age), Toast.LENGTH_SHORT).show()
-                return false
-            }
-            selectedGenderId == -1 -> {
-                Toast.makeText(requireContext(), getString(R.string.please_select_gender), Toast.LENGTH_SHORT).show()
-                return false
-            }
-            heightText.isEmpty() -> {
-                Toast.makeText(requireContext(), getString(R.string.please_enter_height), Toast.LENGTH_SHORT).show()
-                return false
-            }
-            weightText.isEmpty() -> {
-                Toast.makeText(requireContext(), getString(R.string.please_enter_weight), Toast.LENGTH_SHORT).show()
-                return false
-            }
-            else -> {
-                val age = ageText.toIntOrNull() ?: 0
-                val height = heightText.toIntOrNull() ?: 0
-                val weight = weightText.toFloatOrNull() ?: 0f
-                
-                when {
-                    age < 10 || age > 120 -> {
-                        Toast.makeText(requireContext(), getString(R.string.invalid_age), Toast.LENGTH_SHORT).show()
-                        return false
-                    }
-                    height < 100 || height > 250 -> {
-                        Toast.makeText(requireContext(), getString(R.string.invalid_height), Toast.LENGTH_SHORT).show()
-                        return false
-                    }
-                    weight < 30f || weight > 200f -> {
-                        Toast.makeText(requireContext(), getString(R.string.invalid_weight), Toast.LENGTH_SHORT).show()
-                        return false
-                    }
-                }
-                return true
-            }
-        }
-    }
-
     private fun calculateAndNavigate() {
-        val age = etAge?.text.toString().toInt()
-        val gender = if (rgGender?.checkedRadioButtonId == R.id.rbMale) "Male" else "Female"
-        val height = etHeight?.text.toString().toInt()
-        val weight = etWeight?.text.toString().toFloat()
+        // Fetch user profile from database
+        val userProfile = dbHelper.getUserProfile()
+        
+        if (userProfile == null) {
+            Toast.makeText(requireContext(), "User profile not found. Please complete profile in Home.", Toast.LENGTH_LONG).show()
+            return
+        }
+        
+        val age = userProfile.age ?: 30
+        val gender = userProfile.gender ?: "Male"
+        val height = userProfile.height?.toInt() ?: 170
+        val weight = userProfile.currentWeight.toFloat()
         
         val calories = calculateCalories(age, gender, height, weight, selectedActivityLevel)
         
