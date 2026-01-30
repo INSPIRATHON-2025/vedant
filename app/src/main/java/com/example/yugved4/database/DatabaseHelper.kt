@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.yugved4.models.Doctor
 import com.example.yugved4.models.UserProfile
+import com.example.yugved4.models.YogaAsana
 import com.example.yugved4.utils.AuthHelper
 import com.example.yugved4.utils.FirestoreHelper
 import kotlinx.coroutines.CoroutineScope
@@ -21,7 +22,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
 
     companion object {
         private const val DATABASE_NAME = "yugved.db"
-        private const val DATABASE_VERSION = 12  // Incremented for video support
+        private const val DATABASE_VERSION = 17  // Incremented for flexibility and strength yoga videos
         
         // Doctors table and columns
         private const val TABLE_DOCTORS = "doctors"
@@ -117,6 +118,13 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         private const val TABLE_PEACE_QUOTES = "peace_quotes"
         private const val COLUMN_QUOTE_ID = "id"
         private const val COLUMN_QUOTE_TEXT = "quote_text"
+        
+        // Weekly activity table and columns
+        private const val TABLE_WEEKLY_ACTIVITY = "weekly_activity"
+        private const val COLUMN_ACTIVITY_ID = "id"
+        private const val COLUMN_ACTIVITY_DATE = "date"
+        private const val COLUMN_ACTIVITY_TYPE = "activity_type" // brisk_walking, running, cycling
+        private const val COLUMN_ACTIVITY_DURATION = "duration_minutes"
     }
 
     /**
@@ -284,6 +292,17 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         """.trimIndent()
         db.execSQL(createPeaceQuotesTable)
         
+        // Create weekly activity table
+        val createWeeklyActivityTable = """
+            CREATE TABLE $TABLE_WEEKLY_ACTIVITY (
+                $COLUMN_ACTIVITY_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COLUMN_ACTIVITY_DATE TEXT NOT NULL,
+                $COLUMN_ACTIVITY_TYPE TEXT NOT NULL,
+                $COLUMN_ACTIVITY_DURATION INTEGER NOT NULL
+            )
+        """.trimIndent()
+        db.execSQL(createWeeklyActivityTable)
+        
         // Insert seed data for peace quotes
         insertPeaceQuotesSeedData(db)
     }
@@ -304,6 +323,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         db.execSQL("DROP TABLE IF EXISTS $TABLE_DAILY_STEPS")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_DAILY_MOODS")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_PEACE_QUOTES")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_WEEKLY_ACTIVITY")
         onCreate(db)
     }
 
@@ -1052,42 +1072,42 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         db.execSQL("""
             INSERT INTO $TABLE_MUSCLE_GROUPS 
             ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
-            VALUES ('Chest', $iconPlaceholder)
+            VALUES ('Chest', ${com.example.yugved4.R.drawable.muscle_chest})
         """)
         
         // Back
         db.execSQL("""
             INSERT INTO $TABLE_MUSCLE_GROUPS 
             ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
-            VALUES ('Back', $iconPlaceholder)
+            VALUES ('Back', ${com.example.yugved4.R.drawable.muscle_back})
         """)
         
         // Shoulders
         db.execSQL("""
             INSERT INTO $TABLE_MUSCLE_GROUPS 
             ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
-            VALUES ('Shoulders', $iconPlaceholder)
+            VALUES ('Shoulders', ${com.example.yugved4.R.drawable.muscle_shoulders})
         """)
         
         // Arms
         db.execSQL("""
             INSERT INTO $TABLE_MUSCLE_GROUPS 
             ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
-            VALUES ('Arms', $iconPlaceholder)
+            VALUES ('Arms', ${com.example.yugved4.R.drawable.muscle_arms})
         """)
         
         // Legs
         db.execSQL("""
             INSERT INTO $TABLE_MUSCLE_GROUPS 
             ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
-            VALUES ('Legs', $iconPlaceholder)
+            VALUES ('Legs', ${com.example.yugved4.R.drawable.muscle_legs})
         """)
         
         // Core
         db.execSQL("""
             INSERT INTO $TABLE_MUSCLE_GROUPS 
             ($COLUMN_MUSCLE_NAME, $COLUMN_MUSCLE_IMAGE) 
-            VALUES ('Core', $iconPlaceholder)
+            VALUES ('Core', ${com.example.yugved4.R.drawable.muscle_core})
         """)
     }
     
@@ -1231,7 +1251,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         // 1. Tadasana (Mountain Pose)
         db.execSQL("""
             INSERT INTO $TABLE_YOGA_ASANAS 
-            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL, $COLUMN_ASANA_VIDEO_URL) 
             VALUES (
                 'Mountain Pose',
                 'Tadasana',
@@ -1239,15 +1259,16 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                 'Improves posture and body awareness,Strengthens thighs knees and ankles,Firms abdomen and buttocks,Relieves sciatica,Reduces flat feet',
                 'Hold for 30-60 seconds',
                 'Beginner',
-                'Standing',
-                $thumbnailPlaceholder
+                'Beginner',
+                ${com.example.yugved4.R.drawable.yoga_tadasana},
+                'file:///android_asset/videos/yoga/beginner/mountain_pose.mp4'
             )
         """)
         
         // 2. Balasana (Child's Pose)
         db.execSQL("""
             INSERT INTO $TABLE_YOGA_ASANAS 
-            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL, $COLUMN_ASANA_VIDEO_URL) 
             VALUES (
                 'Child''s Pose',
                 'Balasana',
@@ -1255,15 +1276,16 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                 'Gently stretches hips thighs and ankles,Calms the brain and relieves stress and fatigue,Relieves back and neck pain when done with head supported,Massages internal organs',
                 'Hold for 1-3 minutes',
                 'Beginner',
-                'Resting',
-                $thumbnailPlaceholder
+                'Beginner',
+                ${com.example.yugved4.R.drawable.yoga_balasana},
+                'file:///android_asset/videos/yoga/beginner/childs_pose.mp4'
             )
         """)
         
         // 3. Sukhasana (Easy Pose)
         db.execSQL("""
             INSERT INTO $TABLE_YOGA_ASANAS 
-            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL, $COLUMN_ASANA_VIDEO_URL) 
             VALUES (
                 'Easy Pose',
                 'Sukhasana',
@@ -1271,124 +1293,115 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                 'Calms the mind and reduces stress,Strengthens the back,Stretches knees and ankles,Opens the hips,Improves posture',
                 'Hold for 5-10 minutes',
                 'Beginner',
-                'Seated',
-                $thumbnailPlaceholder
+                'Beginner',
+                ${com.example.yugved4.R.drawable.yoga_sukhasana},
+                'file:///android_asset/videos/yoga/beginner/easy_pose.mp4'
             )
         """)
         
-        // ===== INTERMEDIATE ASANAS (4) =====
+        // ===== FLEXIBILITY ASANAS (3) =====
         
-        // 4. Adho Mukha Svanasana (Downward-Facing Dog)
+        // 4. Uttanasana (Standing Forward Bend) - Using "Beginner" style for Category/Difficulty as requested
         db.execSQL("""
             INSERT INTO $TABLE_YOGA_ASANAS 
-            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL, $COLUMN_ASANA_VIDEO_URL) 
             VALUES (
-                'Downward-Facing Dog',
-                'Adho Mukha Svanasana',
-                'Start on hands and knees. Spread your fingers wide and press firmly through your palms. Tuck your toes and lift your hips up and back, forming an inverted V-shape. Keep your arms straight and press your chest toward your thighs. Work on straightening your legs and pressing your heels toward the floor. This energizing pose is one of the most recognized yoga poses.',
-                'Calms the brain and relieves stress,Energizes the body,Stretches shoulders hamstrings calves arches and hands,Strengthens arms and legs,Helps relieve headache and insomnia',
+                'Standing Forward Bend',
+                'Uttanasana',
+                'Stand tall, exhale and hinge at your hips to fold forward. Keep your knees slightly bent if needed. Let your head hang heavy. This pose stretches the hamstrings and calms the mind.',
+                'Stretches hamstrings calves and hips,Strengthens thighs and knees,Calms the brain and relieves stress,Stimulates liver and kidneys',
                 'Hold for 1-3 minutes',
-                'Intermediate',
-                'Inversion',
-                $thumbnailPlaceholder
+                'Beginner',
+                'Flexibility',
+                ${com.example.yugved4.R.drawable.yoga_uttanasana},
+                'file:///android_asset/videos/yoga/flexibility/standing_forward_bend.mp4'
             )
         """)
-        
-        // 5. Virabhadrasana I (Warrior I)
+
+        // 5. Kapotasana (Pigeon Pose)
         db.execSQL("""
             INSERT INTO $TABLE_YOGA_ASANAS 
-            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL, $COLUMN_ASANA_VIDEO_URL) 
             VALUES (
-                'Warrior I',
-                'Virabhadrasana I',
-                'Step your right foot forward into a lunge, keeping your back leg straight and turned slightly outward. Bend your front knee to 90 degrees, ensuring it stays directly over your ankle. Square your hips to the front. Raise your arms overhead, palms facing each other. Look up toward your hands. Hold, then switch sides. This powerful pose builds strength and stamina.',
-                'Strengthens shoulders arms legs and back muscles,Opens the chest lungs shoulders and hips,Improves focus balance and stability,Stretches hip flexors,Builds stamina and endurance',
-                'Hold for 30-60 seconds per side',
-                'Intermediate',
-                'Standing',
-                $thumbnailPlaceholder
+                'Pigeon Pose',
+                'Kapotasana',
+                'From all fours, bring your right knee forward towards your right wrist. Extend your left leg back. Square your hips and fold forward if comfortable. This is a deep hip opener.',
+                'Opens hips and chest,Stretches hip flexors and rotators,Relieves lower back tension,Stimulates internal organs',
+                'Hold for 1-2 minutes per side',
+                'Beginner',
+                'Flexibility',
+                ${com.example.yugved4.R.drawable.yoga_kapotasana},
+                'file:///android_asset/videos/yoga/flexibility/pigeon_pose.mp4'
             )
         """)
-        
-        // 6. Trikonasana (Triangle Pose)
+
+        // 6. Baddha Konasana (Butterfly Pose)
         db.execSQL("""
             INSERT INTO $TABLE_YOGA_ASANAS 
-            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL, $COLUMN_ASANA_VIDEO_URL) 
             VALUES (
-                'Triangle Pose',
-                'Trikonasana',
-                'Stand with feet wide apart. Turn your right foot out 90 degrees and left foot slightly in. Extend your arms parallel to the floor. Reach your right hand toward your right foot, hinging at the hip. Place your right hand on your shin, ankle, or the floor. Extend your left arm straight up. Gaze at your top hand. This pose strengthens and stretches the entire body.',
-                'Stretches legs groins hips and spine,Opens the chest and shoulders,Strengthens thighs knees and ankles,Stimulates abdominal organs,Improves balance and concentration',
-                'Hold for 30-60 seconds per side',
-                'Intermediate',
-                'Standing',
-                $thumbnailPlaceholder
+                'Butterfly Pose',
+                'Baddha Konasana',
+                'Sit with the soles of your feet touching and knees dropping open to the sides. Hold your feet and lengthen your spine. You can gently flutter your knees.',
+                'Stretches inner thighs groins and knees,Stimulates abdominal organs,Relieves mild depression and anxiety,Helps relieve menstrual discomfort',
+                'Hold for 1-5 minutes',
+                'Beginner',
+                'Flexibility',
+                ${com.example.yugved4.R.drawable.yoga_baddha_konasana},
+                'file:///android_asset/videos/yoga/flexibility/butterfly_pose.mp4'
             )
         """)
-        
-        // 7. Bhujangasana (Cobra Pose)
+
+        // ===== STRENGTH ASANAS (3) =====
+
+        // 7. Phalakasana (Plank Pose)
         db.execSQL("""
             INSERT INTO $TABLE_YOGA_ASANAS 
-            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL, $COLUMN_ASANA_VIDEO_URL) 
             VALUES (
-                'Cobra Pose',
-                'Bhujangasana',
-                'Lie face down with palms flat beside your chest. Press your hips and thighs into the floor. Inhale and straighten your arms, lifting your chest off the floor. Keep your elbows slightly bent and shoulders away from your ears. Draw your shoulder blades toward each other. Gaze slightly upward. This gentle backbend opens the chest and strengthens the spine.',
-                'Strengthens the spine and back muscles,Stretches chest shoulders and abdomen,Firms the buttocks,Stimulates abdominal organs,Relieves stress and fatigue,Opens the heart and lungs',
-                'Hold for 15-30 seconds',
-                'Intermediate',
-                'Backbend',
-                $thumbnailPlaceholder
-            )
-        """)
-        
-        // ===== ADVANCED ASANAS (3) =====
-        
-        // 8. Sirsasana (Headstand)
-        db.execSQL("""
-            INSERT INTO $TABLE_YOGA_ASANAS 
-            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
-            VALUES (
-                'Headstand',
-                'Sirsasana',
-                'Kneel and interlace your fingers, forming a basket with your hands. Place the crown of your head on the floor inside your hands. Straighten your legs and walk your feet toward your head. Engage your core and slowly lift both legs up until perpendicular to the floor. Hold steady, distributing weight across your forearms. This is the king of asanas, requiring strength, balance, and practice. Only attempt with proper instruction.',
-                'Increases blood flow to the brain,Strengthens arms shoulders and core,Improves balance and focus,Stimulates pituitary and pineal glands,Calms the mind,Builds confidence',
-                'Hold for 10 seconds to 5 minutes gradually',
-                'Advanced',
-                'Inversion',
-                $thumbnailPlaceholder
-            )
-        """)
-        
-        // 9. Bakasana (Crow Pose)
-        db.execSQL("""
-            INSERT INTO $TABLE_YOGA_ASANAS 
-            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
-            VALUES (
-                'Crow Pose',
-                'Bakasana',
-                'Squat with feet together. Place your palms flat on the floor, shoulder-width apart. Bend your elbows slightly and place your knees on the backs of your upper arms. Lean forward, shifting your weight onto your hands. Lift one foot off the ground, then the other. Engage your core and gaze forward. Balance on your hands. This challenging arm balance builds upper body strength and mental focus.',
-                'Strengthens arms wrists shoulders and core,Stretches the upper back,Improves balance and body awareness,Builds concentration and confidence,Tones the abdominal organs',
-                'Hold for 20-60 seconds',
-                'Advanced',
-                'Arm Balance',
-                $thumbnailPlaceholder
-            )
-        """)
-        
-        // 10. Ustrasana (Camel Pose)
-        db.execSQL("""
-            INSERT INTO $TABLE_YOGA_ASANAS 
-            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL) 
-            VALUES (
-                'Camel Pose',
-                'Ustrasana',
-                'Kneel with knees hip-width apart. Place your hands on your lower back, fingers pointing down. Inhale and lift your chest, arching your back. If comfortable, reach back one hand at a time to grasp your heels. Push your hips forward. Drop your head back gently if it feels comfortable for your neck. This deep backbend opens the entire front of the body and requires careful practice.',
-                'Stretches entire front of body including ankles thighs and abdomen,Improves posture and spinal flexibility,Strengthens back muscles,Stimulates organs of abdomen and neck,Reduces fat on thighs,Opens the heart chakra',
+                'Plank Pose',
+                'Phalakasana',
+                'Start on hands and knees. Step feet back to straighten legs. Shoulders over wrists, body in a straight line. Engage your core. Don''t let hips sag.',
+                'Strengthens arms wrists and spine,Tones the abdomen,Builds stamina and endurance,Improves posture',
                 'Hold for 30-60 seconds',
-                'Advanced',
-                'Backbend',
-                $thumbnailPlaceholder
+                'Beginner',
+                'Strength',
+                ${com.example.yugved4.R.drawable.yoga_phalakasana},
+                'file:///android_asset/videos/yoga/strength/plank_pose.mp4'
+            )
+        """)
+
+        // 8. Virabhadrasana II (Warrior II)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL, $COLUMN_ASANA_VIDEO_URL) 
+            VALUES (
+                'Warrior II',
+                'Virabhadrasana II',
+                'Stand wide, turn right foot out 90 degrees. Bend right knee. Extend arms parallel to floor. Gaze over right hand. Keep torso upright.',
+                'Strengthens legs and ankles,Stretches groins chest and shoulders,Stimulates abdominal organs,Increases stamina',
+                'Hold for 30-60 seconds per side',
+                'Beginner',
+                'Strength',
+                ${com.example.yugved4.R.drawable.yoga_warrior_two},
+                'file:///android_asset/videos/yoga/strength/warrior_two.mp4'
+            )
+        """)
+
+        // 9. Utkatasana (Chair Pose)
+        db.execSQL("""
+            INSERT INTO $TABLE_YOGA_ASANAS 
+            ($COLUMN_ASANA_NAME, $COLUMN_SANSKRIT_NAME, $COLUMN_ASANA_DESCRIPTION, $COLUMN_ASANA_BENEFITS, $COLUMN_ASANA_DURATION, $COLUMN_ASANA_DIFFICULTY, $COLUMN_ASANA_CATEGORY, $COLUMN_ASANA_THUMBNAIL, $COLUMN_ASANA_VIDEO_URL) 
+            VALUES (
+                'Chair Pose',
+                'Utkatasana',
+                'Stand with feet together. Bend knees and sink hips back as if sitting in a chair. Raise arms overhead. Keep chest lifted.',
+                'Strengthens ankles thighs calves and spine,Stretches shoulders and chest,Stimulates abdominal organs,Reduces flat feet',
+                'Hold for 30-60 seconds',
+                'Beginner',
+                'Strength',
+                ${com.example.yugved4.R.drawable.yoga_utkatasana},
+                'file:///android_asset/videos/yoga/strength/chair_pose.mp4'
             )
         """)
     }
@@ -1712,21 +1725,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
     // YOGA ASANAS QUERY METHODS
     // =====================================================
     
-    /**
-     * Data class representing a yoga asana from database
-     */
-    data class YogaAsana(
-        val id: Int,
-        val name: String,
-        val sanskritName: String,
-        val description: String,
-        val benefits: List<String>,  // Parsed from comma-separated string
-        val duration: String,
-        val difficultyLevel: String,
-        val category: String,
-        val thumbnailResource: Int,
-        val videoUrl: String? = null
-    )
+
     
     /**
      * Get all yoga asanas from database
@@ -1754,7 +1753,18 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                     } else null
                     
                     asanaList.add(
-                        YogaAsana(id, name, sanskritName, description, benefits, duration, difficultyLevel, category, thumbnailResource, videoUrl)
+                        YogaAsana(
+                            asanaId = id.toString(),
+                            name = name,
+                            sanskritName = sanskritName,
+                            difficultyLevel = difficultyLevel,
+                            videoUrl = videoUrl ?: "",
+                            description = description,
+                            benefits = benefits,
+                            duration = duration,
+                            category = category,
+                            thumbnail = thumbnailResource
+                        )
                     )
                 } while (cursor.moveToNext())
             }
@@ -1773,10 +1783,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         val asanaList = mutableListOf<YogaAsana>()
         val db = readableDatabase
         
-        // Query with WHERE clause filtering by difficulty level
-        val query = "SELECT * FROM $TABLE_YOGA_ASANAS WHERE $COLUMN_ASANA_DIFFICULTY = ? ORDER BY $COLUMN_ASANA_NAME"
+        // Query with WHERE clause filtering by difficulty level or category
+        val query = "SELECT * FROM $TABLE_YOGA_ASANAS WHERE $COLUMN_ASANA_DIFFICULTY = ? OR $COLUMN_ASANA_CATEGORY = ? ORDER BY $COLUMN_ASANA_NAME"
         
-        db.rawQuery(query, arrayOf(category)).use { cursor ->
+        db.rawQuery(query, arrayOf(category, category)).use { cursor ->
             if (cursor.moveToFirst()) {
                 do {
                     val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ASANA_ID))
@@ -1794,7 +1804,18 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                     } else null
                     
                     asanaList.add(
-                        YogaAsana(id, name, sanskritName, description, benefits, duration, difficultyLevel, categoryValue, thumbnailResource, videoUrl)
+                        YogaAsana(
+                            asanaId = id.toString(),
+                            name = name,
+                            sanskritName = sanskritName,
+                            difficultyLevel = difficultyLevel,
+                            videoUrl = videoUrl ?: "",
+                            description = description,
+                            benefits = benefits,
+                            duration = duration,
+                            category = categoryValue,
+                            thumbnail = thumbnailResource
+                        )
                     )
                 } while (cursor.moveToNext())
             }
@@ -1832,7 +1853,18 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                     cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ASANA_VIDEO_URL))
                 } else null
                 
-                asana = YogaAsana(id, name, sanskritName, description, benefits, duration, difficultyLevel, category, thumbnailResource, videoUrl)
+                asana = YogaAsana(
+                    asanaId = id.toString(),
+                    name = name,
+                    sanskritName = sanskritName,
+                    difficultyLevel = difficultyLevel,
+                    videoUrl = videoUrl ?: "",
+                    description = description,
+                    benefits = benefits,
+                    duration = duration,
+                    category = category,
+                    thumbnail = thumbnailResource
+                )
             }
         }
         
@@ -2118,5 +2150,97 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         
         db.close()
         return goal
+    }
+    
+    // =====================================================
+    // ACTIVITY TRACKING METHODS
+    // =====================================================
+    
+    /**
+     * Save activity minutes for a specific date and type
+     */
+    fun saveActivityMinutes(date: String, activityType: String, minutes: Int) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_ACTIVITY_DATE, date)
+            put(COLUMN_ACTIVITY_TYPE, activityType)
+            put(COLUMN_ACTIVITY_DURATION, minutes)
+        }
+        
+        // Check if entry exists for this date and type
+        val cursor = db.rawQuery(
+            "SELECT $COLUMN_ACTIVITY_ID FROM $TABLE_WEEKLY_ACTIVITY WHERE $COLUMN_ACTIVITY_DATE = ? AND $COLUMN_ACTIVITY_TYPE = ?",
+            arrayOf(date, activityType)
+        )
+        
+        if (cursor.moveToFirst()) {
+            // Update existing
+            val id = cursor.getInt(0)
+            db.update(TABLE_WEEKLY_ACTIVITY, values, "$COLUMN_ACTIVITY_ID = ?", arrayOf(id.toString()))
+        } else {
+            // Insert new
+            db.insert(TABLE_WEEKLY_ACTIVITY, null, values)
+        }
+        cursor.close()
+        db.close()
+    }
+    
+    /**
+     * Get activity minutes for a specific date and type
+     */
+    fun getActivityMinutes(date: String, activityType: String): Int {
+        val db = readableDatabase
+        var minutes = 0
+        
+        db.rawQuery(
+            "SELECT $COLUMN_ACTIVITY_DURATION FROM $TABLE_WEEKLY_ACTIVITY WHERE $COLUMN_ACTIVITY_DATE = ? AND $COLUMN_ACTIVITY_TYPE = ?",
+            arrayOf(date, activityType)
+        ).use { cursor ->
+            if (cursor.moveToFirst()) {
+                minutes = cursor.getInt(0)
+            }
+        }
+        
+        db.close()
+        return minutes
+    }
+    
+    /**
+     * Get total activity minutes for the current week (Sunday to Saturday)
+     */
+    fun getWeeklyActivityMinutes(activityType: String): Int {
+        val db = readableDatabase
+        var totalMinutes = 0
+        
+        // Get start and end of current week
+        val calendar = java.util.Calendar.getInstance()
+        calendar.set(java.util.Calendar.DAY_OF_WEEK, java.util.Calendar.SUNDAY)
+        val startDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(calendar.time)
+        
+        calendar.add(java.util.Calendar.DATE, 6)
+        val endDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(calendar.time)
+        
+        val query = """
+            SELECT SUM($COLUMN_ACTIVITY_DURATION) FROM $TABLE_WEEKLY_ACTIVITY 
+            WHERE $COLUMN_ACTIVITY_TYPE = ? AND $COLUMN_ACTIVITY_DATE BETWEEN ? AND ?
+        """
+        
+        db.rawQuery(query, arrayOf(activityType, startDate, endDate)).use { cursor ->
+            if (cursor.moveToFirst()) {
+                totalMinutes = cursor.getInt(0)
+            }
+        }
+        
+        db.close()
+        return totalMinutes
+    }
+    
+    /**
+     * Get total exercise minutes for the current week (all types)
+     */
+    fun getTotalWeeklyMinutes(): Int {
+        return getWeeklyActivityMinutes("brisk_walking") + 
+               getWeeklyActivityMinutes("running") + 
+               getWeeklyActivityMinutes("cycling")
     }
 }

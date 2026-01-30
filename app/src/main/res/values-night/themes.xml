@@ -17,6 +17,10 @@
         <item name="colorOnSurface">@color/text_primary_dark</item>
         <item name="colorOnSurfaceVariant">@color/text_secondary_dark</item>
         <item name="colorOutline">@color/outline_dark</item>
+
+        <!-- Default Text Colors -->
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
         
         <!-- Background Colors -->
         <item name="android:colorBackground">@color/background_dark</item>

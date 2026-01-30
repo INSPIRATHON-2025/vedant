@@ -66,22 +66,8 @@ class AsanaListFragment : Fragment() {
         // Fetch from database using SQL query
         val asanasFromDb = dbHelper.getAsanasByCategory(categoryName)
         
-        // Convert DatabaseHelper.YogaAsana to models.YogaAsana
-        asanasFromDb.forEach { dbAsana ->
-            asanas.add(
-                YogaAsana(
-                    asanaId = dbAsana.id.toString(),  // Convert Int to String for compatibility
-                    name = dbAsana.name,
-                    sanskritName = dbAsana.sanskritName,
-                    difficultyLevel = dbAsana.difficultyLevel,
-                    videoUrl = "placeholder",  // Not stored in database yet
-                    description = dbAsana.description,
-                    benefits = dbAsana.benefits,
-                    duration = dbAsana.duration,
-                    category = dbAsana.category
-                )
-            )
-        }
+        // Add directly to list (DatabaseHelper now returns compatible model)
+        asanas.addAll(asanasFromDb)
     }
 
     /**

@@ -8,7 +8,7 @@
 
     <item
         android:id="@+id/workoutFragment"
-        android:icon="@drawable/ic_activity"
+        android:icon="@drawable/ic_yoga"
         android:title="Workout" />
 
     <item

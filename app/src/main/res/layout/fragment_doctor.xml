@@ -48,14 +48,14 @@
                 android:layout_marginBottom="16dp"
                 android:contentDescription="@string/no_doctors_icon"
                 android:src="@drawable/ic_doctor"
-                app:tint="@color/text_secondary"
+                app:tint="?attr/colorOnSurfaceVariant"
                 android:alpha="0.5" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/no_doctors_added"
-                android:textColor="@color/text_secondary"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="16sp" />
 
             <TextView
@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/tap_plus_to_add"
-                android:textColor="@color/text_secondary"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="14sp" />
 
         </LinearLayout>

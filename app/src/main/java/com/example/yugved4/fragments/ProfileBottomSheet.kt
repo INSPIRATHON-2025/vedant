@@ -133,6 +133,9 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
     private fun setupThemeToggle() {
         // Set initial switch state
         val isDarkMode = ThemeHelper.isDarkMode(requireContext())
+        
+        // Remove listener before setting state to avoid triggering it
+        binding.switchTheme.setOnCheckedChangeListener(null)
         binding.switchTheme.isChecked = isDarkMode
         
         // Handle theme toggle
@@ -143,13 +146,16 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
                 ThemeHelper.THEME_LIGHT
             }
             
-            // Save and apply theme
-            ThemeHelper.saveTheme(requireContext(), newTheme)
-            ThemeHelper.applyThemeMode(newTheme)
-            
-            // Show confirmation
-            val message = if (isChecked) "Dark mode enabled" else "Light mode enabled"
-            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            // Only apply if changed to prevent loops
+            if (newTheme != ThemeHelper.getTheme(requireContext())) {
+                // Save and apply theme
+                ThemeHelper.saveTheme(requireContext(), newTheme)
+                ThemeHelper.applyThemeMode(newTheme)
+                
+                // Show confirmation
+                val message = if (isChecked) "Dark mode enabled" else "Light mode enabled"
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

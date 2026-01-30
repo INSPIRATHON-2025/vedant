@@ -12,5 +12,6 @@ data class YogaAsana(
     val description: String,
     val benefits: List<String>,
     val duration: String, // e.g., "30 seconds", "1 minute"
-    val category: String // "Standing", "Seated", "Balancing", "Backbend", "Inversion"
+    val category: String, // "Standing", "Seated", "Balancing", "Backbend", "Inversion"
+    val thumbnail: Int = com.example.yugved4.R.drawable.ic_yoga // Default to placeholder
 )

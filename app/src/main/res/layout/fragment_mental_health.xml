@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/background_light">
+    android:background="?android:colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -64,70 +64,87 @@
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp" />
 
-                <LinearLayout
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:weightSum="5">
+                    android:scrollbars="none"
+                    android:fillViewport="true">
 
-                    <Button
-                        android:id="@+id/btnMood1"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="64dp"
-                        android:layout_weight="1"
-                        android:layout_margin="4dp"
-                        android:text="😫"
-                        android:textSize="28sp"
-                        app:cornerRadius="12dp" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
 
-                    <Button
-                        android:id="@+id/btnMood2"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="64dp"
-                        android:layout_weight="1"
-                        android:layout_margin="4dp"
-                        android:text="😟"
-                        android:textSize="28sp"
-                        app:cornerRadius="12dp" />
+                        <Button
+                            android:id="@+id/btnMood1"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:text="😫"
+                            android:textSize="24sp"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            app:cornerRadius="12dp" />
 
-                    <Button
-                        android:id="@+id/btnMood3"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="64dp"
-                        android:layout_weight="1"
-                        android:layout_margin="4dp"
-                        android:text="😐"
-                        android:textSize="28sp"
-                        app:cornerRadius="12dp" />
+                        <Button
+                            android:id="@+id/btnMood2"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:text="😟"
+                            android:textSize="24sp"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            app:cornerRadius="12dp" />
 
-                    <Button
-                        android:id="@+id/btnMood4"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="64dp"
-                        android:layout_weight="1"
-                        android:layout_margin="4dp"
-                        android:text="🙂"
-                        android:textSize="28sp"
-                        app:cornerRadius="12dp" />
+                        <Button
+                            android:id="@+id/btnMood3"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:text="😐"
+                            android:textSize="24sp"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            app:cornerRadius="12dp" />
 
-                    <Button
-                        android:id="@+id/btnMood5"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_height="64dp"
-                        android:layout_weight="1"
-                        android:layout_margin="4dp"
-                        android:text="😄"
-                        android:textSize="28sp"
-                        app:cornerRadius="12dp" />
+                        <Button
+                            android:id="@+id/btnMood4"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:text="🙂"
+                            android:textSize="24sp"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            app:cornerRadius="12dp" />
 
-                </LinearLayout>
+                        <Button
+                            android:id="@+id/btnMood5"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:layout_marginHorizontal="4dp"
+                            android:text="😄"
+                            android:textSize="24sp"
+                            android:padding="0dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            app:cornerRadius="12dp" />
+
+                    </LinearLayout>
+
+                </HorizontalScrollView>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
@@ -207,9 +224,66 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Peaceful rain sounds for meditation"
+                    android:text="Choose your relaxation sounds"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp" />
+
+                <!-- Scrollable Music Type Toggle Group -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:scrollbars="none"
+                    android:fillViewport="true">
+
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggleGroupMusic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:singleSelection="true"
+                        app:selectionRequired="true"
+                        app:checkedButton="@+id/btnNoise">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnBinaural"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎵 Binaural"
+                            android:textSize="12sp"
+                            app:cornerRadius="20dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnNoise"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🌧️ White Noise"
+                            android:textSize="12sp"
+                            app:cornerRadius="20dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnGuided"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🧘 Guided"
+                            android:textSize="12sp"
+                            app:cornerRadius="20dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnLofi"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎧 Lo-fi"
+                            android:textSize="12sp"
+                            app:cornerRadius="20dp" />
+
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                </HorizontalScrollView>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnToggleAudio"

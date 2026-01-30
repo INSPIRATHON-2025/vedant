@@ -15,9 +15,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.example.yugved4.R
 import com.example.yugved4.database.DatabaseHelper
 import com.example.yugved4.databinding.FragmentStepBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -27,7 +24,10 @@ import java.util.Locale
 
 /**
  * Step Counter Fragment
- * Simple step tracking with circular display and ON/OFF toggle
+ * Enhanced with Samsung Health-style features:
+ * - WHO 150 min/week goal
+ * - Calories with fun comparison
+ * - Distance with colosseum comparison
  */
 class StepFragment : Fragment(), SensorEventListener {
 
@@ -41,8 +41,15 @@ class StepFragment : Fragment(), SensorEventListener {
     
     private var initialStepCount: Int = 0
     private var isFirstReading = true
-    private val stepGoal = 10000
     private var isTracking = false
+    
+    // Constants for calculations
+    private val STEPS_PER_MINUTE_WALKING = 100 // Average walking cadence
+    private val CALORIES_PER_STEP = 0.04 // Average kcal per step
+    private val STEP_LENGTH_METERS = 0.762 // Average stride length (~2.5ft)
+    private val COCONUT_WATER_CALORIES = 45 // Approx calories in 1 cup
+    private val COLOSSEUM_LOOP_KM = 0.527 // Perimeter of Colosseum
+    private val WHO_WEEKLY_GOAL_MIN = 150
     
     // Permission launcher
     private val activityPermissionLauncher = registerForActivityResult(
@@ -82,6 +89,9 @@ class StepFragment : Fragment(), SensorEventListener {
         loadSavedState()
         setupToggleButton()
         setupProfileButton()
+        
+        // Initial UI update
+        updateWeeklyStats()
     }
     
     private fun checkSensorAvailability() {
@@ -92,13 +102,6 @@ class StepFragment : Fragment(), SensorEventListener {
                 requireContext(),
                 "⚠️ NO STEP SENSOR! Are you on an emulator? Use a real phone!",
                 Toast.LENGTH_LONG
-            ).show()
-        } else {
-            // Sensor exists
-            Toast.makeText(
-                requireContext(),
-                "✅ Step counter sensor detected!",
-                Toast.LENGTH_SHORT
             ).show()
         }
     }
@@ -134,15 +137,7 @@ class StepFragment : Fragment(), SensorEventListener {
         }
     }
     
-    /**
-     * Setup profile button with click listener and load Google photo
-     */
     private fun setupProfileButton() {
-        // Load Google profile photo into button
-        // Profile button now just shows default icon (defined in XML)
-        // Photo loading removed as per user request (show photo only in menu)
-        
-        // Set click listener to show profile bottom sheet
         binding.btnProfile.setOnClickListener {
             val profileBottomSheet = ProfileBottomSheet()
             profileBottomSheet.show(parentFragmentManager, "ProfileBottomSheet")
@@ -208,21 +203,48 @@ class StepFragment : Fragment(), SensorEventListener {
     }
     
     private fun updateStepDisplay(stepCount: Int) {
-        binding.tvStepCount.text = stepCount.toString()
+        // Calculate metrics
+        val caloriesBurned = (stepCount * CALORIES_PER_STEP).toInt()
+        val distanceKm = (stepCount * STEP_LENGTH_METERS) / 1000
         
-        // Update circular progress
+        // Update Calories Card
+        binding.tvCalories.text = caloriesBurned.toString()
+        val cups = String.format("%.2f", caloriesBurned.toFloat() / COCONUT_WATER_CALORIES)
+        binding.tvCalComparison.text = "≈$cups cups of nariyal pani"
+        
+        // Update Distance Card
+        binding.tvDistance.text = String.format("%.2f", distanceKm)
+        val laps = String.format("%.2f", distanceKm / COLOSSEUM_LOOP_KM)
+        binding.tvDistComparison.text = "≈Run $laps lap(s) around the Colosseum"
+        
+        // Update Step Counter Card (Simplified)
+        val stepGoal = 10000 // Default goal
         val progress = ((stepCount.toFloat() / stepGoal) * 100).toInt().coerceIn(0, 100)
-        binding.circularProgress.progress = progress
         
-        // Update goal text
-        binding.tvGoal.text = "Goal: $stepGoal steps"
+        binding.progressSteps.progress = progress
+        binding.tvStepCountDisplay.text = stepCount.toString()
+        binding.tvStepGoalLabel.text = "/ $stepGoal"
+        
+        // Save today's activity minutes (Background tracking)
+        // We assume all steps are "Brisk walking" for simplicity
+        val walkingMinutes = stepCount / STEPS_PER_MINUTE_WALKING
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        dbHelper.saveActivityMinutes(today, "brisk_walking", walkingMinutes)
+        
+        // Update hidden fields for backward compatibility if any
+        binding.tvStepCount.text = stepCount.toString()
+    }
+    
+    private fun updateWeeklyStats() {
+        // Method kept empty or removed as UI for this is removed
+        // Background tracking still happens in updateStepDisplay
     }
     
     private fun updateStatusText() {
         binding.tvStatus.text = if (isTracking) {
-            "Tracking your steps..."
+            "Status: Tracking your steps..."
         } else {
-            "Step tracking is OFF"
+            "Status: Step tracking is OFF"
         }
     }
     
@@ -231,27 +253,20 @@ class StepFragment : Fragment(), SensorEventListener {
             if (it.sensor.type == Sensor.TYPE_STEP_COUNTER) {
                 val totalStepsSinceBoot = it.values[0].toInt()
                 
-                // DEBUG: Show sensor is working
-                Toast.makeText(requireContext(), "Sensor fired! Total since boot: $totalStepsSinceBoot", Toast.LENGTH_SHORT).show()
-                
                 if (isFirstReading) {
                     val savedSteps = dbHelper.getTodayStepCount()
                     initialStepCount = totalStepsSinceBoot - savedSteps
                     isFirstReading = false
-                    
-                    // DEBUG: Show baseline calculation
-                    Toast.makeText(requireContext(), "Baseline set: $initialStepCount (saved: $savedSteps)", Toast.LENGTH_SHORT).show()
                 }
                 
                 val todaySteps = totalStepsSinceBoot - initialStepCount
-                updateStepDisplay(todaySteps)
                 
                 // Save to database
                 val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                 dbHelper.saveStepCount(today, todaySteps)
                 
-                // DEBUG: Show today's steps
-                Toast.makeText(requireContext(), "Today's steps: $todaySteps", Toast.LENGTH_SHORT).show()
+                // Update UI
+                updateStepDisplay(todaySteps)
             }
         }
     }

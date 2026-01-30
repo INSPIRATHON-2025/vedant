@@ -53,4 +53,13 @@
     <!-- Added Colors -->
     <color name="gray_600">#757575</color>
     <color name="blue_500">#2196F3</color>
+
+    <!-- Step Counter Card Colors -->
+    <color name="card_dark_bg">#1A1A1A</color>
+    <color name="activity_brisk_walking">#FF6B6B</color>
+    <color name="activity_running">#4A90D9</color>
+    <color name="activity_cycling">#9B59B6</color>
+    <color name="card_calories_bg">#FFB6C1</color>
+    <color name="card_distance_bg">#E8EAF6</color>
+    <color name="progress_gray">#4A4A4A</color>
 </resources>

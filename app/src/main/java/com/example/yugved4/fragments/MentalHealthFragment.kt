@@ -18,6 +18,7 @@ import com.example.yugved4.adapters.HelplineCardAdapter
 import com.example.yugved4.utils.AuthHelper
 import com.example.yugved4.database.DatabaseHelper
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.android.material.textfield.TextInputEditText
@@ -33,8 +34,11 @@ class MentalHealthFragment : Fragment() {
     private lateinit var dbHelper: DatabaseHelper
     
     // UI Components
-
+    private lateinit var toggleGroupMusic: MaterialButtonToggleGroup
     private lateinit var btnToggleAudio: MaterialButton
+    
+    // Default to white_noise (will need actual resource when audio files are added)
+    private var selectedMusicResId: Int = 0 // Will be R.raw.white_noise when available
     private lateinit var btnMood1: Button
     private lateinit var btnMood2: Button
     private lateinit var btnMood3: Button
@@ -65,7 +69,7 @@ class MentalHealthFragment : Fragment() {
         dbHelper = DatabaseHelper(requireContext())
 
         // Initialize views
-
+        toggleGroupMusic = view.findViewById(R.id.toggleGroupMusic)
         btnToggleAudio = view.findViewById(R.id.btnToggleAudio)
         btnMood1 = view.findViewById(R.id.btnMood1)
         btnMood2 = view.findViewById(R.id.btnMood2)
@@ -94,7 +98,8 @@ class MentalHealthFragment : Fragment() {
         // Setup mood buttons
         setupMoodTracking()
         
-
+        // Setup music type toggle listener
+        setupMusicToggleGroup()
         
         // Setup audio player (only if audio file exists)
         setupAudioPlayer()
@@ -214,9 +219,96 @@ class MentalHealthFragment : Fragment() {
      * Setup audio player for relaxation sounds
      * Note: Requires rain_sounds.mp3 in res/raw directory
      */
+    /**
+     * Setup music type toggle group listener
+     */
+    private fun setupMusicToggleGroup() {
+        toggleGroupMusic.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                // Map button IDs to resource IDs
+                // TODO: Replace with actual R.raw resources when audio files are added
+                val musicName = when (checkedId) {
+                    R.id.btnBinaural -> "binaural_beats"
+                    R.id.btnNoise -> "white_noise"
+                    R.id.btnGuided -> "guided_meditation"
+                    R.id.btnLofi -> "ambient_lofi"
+                    else -> "white_noise"
+                }
+                
+                // If currently playing, switch to the new track
+                if (isPlaying) {
+                    stopAndReleasePlayer()
+                    startNewPlayer(musicName)
+                }
+            }
+        }
+    }
+    
     private fun setupAudioPlayer() {
         btnToggleAudio.setOnClickListener {
             toggleAudio()
+        }
+    }
+    
+    /**
+     * Stop and release current media player
+     */
+    private fun stopAndReleasePlayer() {
+        mediaPlayer?.apply {
+            if (isPlaying) {
+                stop()
+            }
+            release()
+        }
+        mediaPlayer = null
+    }
+    
+    /**
+     * Get the currently selected music name based on toggle group selection
+     */
+    private fun getSelectedMusicName(): String {
+        return when (toggleGroupMusic.checkedButtonId) {
+            R.id.btnBinaural -> "binaural_beats"
+            R.id.btnNoise -> "white_noise"
+            R.id.btnGuided -> "guided_meditation"
+            R.id.btnLofi -> "ambient_lofi"
+            else -> "white_noise"
+        }
+    }
+    
+    /**
+     * Start a new media player with the specified music
+     */
+    private fun startNewPlayer(musicName: String) {
+        try {
+            // Try to get the resource ID dynamically
+            val resId = resources.getIdentifier(musicName, "raw", requireContext().packageName)
+            
+            if (resId == 0) {
+                Toast.makeText(
+                    requireContext(),
+                    "Audio file '$musicName.mp3' not found. Please add it to res/raw/",
+                    Toast.LENGTH_LONG
+                ).show()
+                isPlaying = false
+                btnToggleAudio.text = "▶️ Play Sounds"
+                btnToggleAudio.setIconResource(android.R.drawable.ic_media_play)
+                return
+            }
+            
+            mediaPlayer = MediaPlayer.create(requireContext(), resId)
+            mediaPlayer?.isLooping = true
+            mediaPlayer?.start()
+            isPlaying = true
+            btnToggleAudio.text = "⏸️ Pause Sounds"
+            btnToggleAudio.setIconResource(android.R.drawable.ic_media_pause)
+        } catch (e: Exception) {
+            Toast.makeText(
+                requireContext(),
+                "Error playing audio: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
+            isPlaying = false
         }
     }
     
@@ -226,42 +318,15 @@ class MentalHealthFragment : Fragment() {
     private fun toggleAudio() {
         try {
             if (isPlaying) {
-                // Pause audio
-                mediaPlayer?.pause()
+                // Stop and release current player
+                stopAndReleasePlayer()
                 isPlaying = false
                 btnToggleAudio.text = "▶️ Play Sounds"
                 btnToggleAudio.setIconResource(android.R.drawable.ic_media_play)
             } else {
-                // Initialize if needed
-                if (mediaPlayer == null) {
-                    // Check if audio file exists by trying to create MediaPlayer
-                    try {
-                        // TODO: Add rain_sounds.mp3 to res/raw/ directory to enable this feature
-                        // mediaPlayer = MediaPlayer.create(requireContext(), R.raw.rain_sounds)
-                        // mediaPlayer?.isLooping = true
-                        
-                        // Show message that audio file is not available
-                        Toast.makeText(
-                            requireContext(),
-                            "Audio file not found. Please add rain_sounds.mp3 to res/raw/",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        return
-                    } catch (e: Exception) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Audio file not found. Please add rain_sounds.mp3 to res/raw/",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        return
-                    }
-                }
-                
-                // Play audio
-                mediaPlayer?.start()
-                isPlaying = true
-                btnToggleAudio.text = "⏸️ Pause Sounds"
-                btnToggleAudio.setIconResource(android.R.drawable.ic_media_pause)
+                // Start new player with selected music
+                val musicName = getSelectedMusicName()
+                startNewPlayer(musicName)
             }
         } catch (e: Exception) {
             Toast.makeText(

@@ -25,7 +25,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:contentDescription="@string/asana_icon"
-            app:tint="?attr/colorPrimary"
+
             android:src="@drawable/ic_yoga" />
 
         <!-- Text Content -->

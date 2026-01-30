@@ -17,6 +17,10 @@
         <item name="colorOnSurface">@color/text_primary</item>
         <item name="colorOnSurfaceVariant">@color/text_secondary</item>
         <item name="colorOutline">@color/outline_light</item>
+
+        <!-- Default Text Colors -->
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
         
         <!-- Background Colors -->
         <item name="android:colorBackground">@color/background_light</item>

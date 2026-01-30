@@ -14,9 +14,10 @@ object YogaDataProvider {
      */
     fun getYogaCategories(): List<Category> {
         return listOf(
-            Category(1, "Beginner", R.drawable.ic_yoga, 8),
-            Category(2, "Flexibility", R.drawable.ic_yoga, 10),
-            Category(3, "Strength", R.drawable.ic_yoga, 12)
+        return listOf(
+            Category(2, "Flexibility", R.drawable.ic_yoga, 3),
+            Category(3, "Strength", R.drawable.ic_yoga, 3)
+        )
         )
     }
     

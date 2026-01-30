@@ -24,8 +24,7 @@
             android:layout_height="64dp"
             android:src="@drawable/ic_activity"
             android:contentDescription="Muscle group icon"
-            android:scaleType="centerInside"
-            app:tint="?attr/colorPrimary" />
+            android:scaleType="fitCenter" />
 
         <!-- Muscle Group Name -->
         <TextView

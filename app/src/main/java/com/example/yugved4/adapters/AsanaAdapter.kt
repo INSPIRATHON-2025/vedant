@@ -38,6 +38,7 @@ class AsanaAdapter(
         holder.tvEnglishName.text = asana.name
         holder.tvDuration.text = asana.duration
         holder.tvDifficulty.text = asana.difficultyLevel
+        holder.ivIcon.setImageResource(asana.thumbnail)
         
         // Handle click
         holder.itemView.setOnClickListener {

@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.yugved4.R
 import com.example.yugved4.database.DatabaseHelper
+import com.example.yugved4.models.YogaAsana
 import com.google.android.material.chip.Chip
 
 /**
@@ -35,7 +36,7 @@ class AsanaDetailFragment : Fragment() {
     private lateinit var dbHelper: DatabaseHelper
     
     private var asanaId: Int = 0
-    private var asana: DatabaseHelper.YogaAsana? = null
+    private var asana: com.example.yugved4.models.YogaAsana? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
