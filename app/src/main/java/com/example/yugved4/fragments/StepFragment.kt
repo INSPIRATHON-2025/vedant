@@ -15,6 +15,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.yugved4.adapters.StepHistoryAdapter
 import com.example.yugved4.database.DatabaseHelper
 import com.example.yugved4.databinding.FragmentStepBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -42,6 +44,9 @@ class StepFragment : Fragment(), SensorEventListener {
     private var initialStepCount: Int = 0
     private var isFirstReading = true
     private var isTracking = false
+    
+    // Step history adapter
+    private lateinit var stepHistoryAdapter: StepHistoryAdapter
     
     // Constants for calculations
     private val STEPS_PER_MINUTE_WALKING = 100 // Average walking cadence
@@ -89,9 +94,39 @@ class StepFragment : Fragment(), SensorEventListener {
         loadSavedState()
         setupToggleButton()
         setupProfileButton()
+        setupStepHistoryRecyclerView()
         
         // Initial UI update
         updateWeeklyStats()
+        loadStepHistory()
+    }
+    
+    /**
+     * Setup the RecyclerView for step history
+     */
+    private fun setupStepHistoryRecyclerView() {
+        stepHistoryAdapter = StepHistoryAdapter(emptyList())
+        binding.rvStepHistory.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = stepHistoryAdapter
+            isNestedScrollingEnabled = false
+        }
+    }
+    
+    /**
+     * Load step history from database and update the RecyclerView
+     */
+    private fun loadStepHistory() {
+        val stepHistory = dbHelper.getAllStepHistory()
+        
+        if (stepHistory.isEmpty()) {
+            binding.tvNoHistoryMessage.visibility = View.VISIBLE
+            binding.rvStepHistory.visibility = View.GONE
+        } else {
+            binding.tvNoHistoryMessage.visibility = View.GONE
+            binding.rvStepHistory.visibility = View.VISIBLE
+            stepHistoryAdapter.updateData(stepHistory)
+        }
     }
     
     private fun checkSensorAvailability() {
@@ -289,6 +324,8 @@ class StepFragment : Fragment(), SensorEventListener {
             val todaySteps = dbHelper.getTodayStepCount()
             updateStepDisplay(todaySteps)
         }
+        // Refresh step history on resume
+        loadStepHistory()
     }
 
     override fun onDestroyView() {

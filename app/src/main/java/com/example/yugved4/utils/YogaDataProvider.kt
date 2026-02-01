@@ -185,7 +185,7 @@ object YogaDataProvider {
                 name = "Standing Forward Bend",
                 sanskritName = "Uttanasana",
                 difficultyLevel = "Intermediate",
-                videoUrl = "https://placeholder.com/uttanasana",
+                videoUrl = "file:///android_asset/videos/yoga/Uttanasan.mp4",
                 description = "A forward fold that stretches the entire back body.",
                 benefits = listOf(
                     "Stretches the hamstrings, calves, and hips",
@@ -217,7 +217,7 @@ object YogaDataProvider {
                 name = "Pigeon Pose",
                 sanskritName = "Kapotasana",
                 difficultyLevel = "Intermediate",
-                videoUrl = "https://placeholder.com/kapotasana",
+                videoUrl = "file:///android_asset/videos/yoga/Kapotasana.mp4",
                 description = "A deep hip opener that releases tension.",
                 benefits = listOf(
                     "Opens the hips and chest",
@@ -313,7 +313,7 @@ object YogaDataProvider {
                 name = "Butterfly Pose",
                 sanskritName = "Baddha Konasana",
                 difficultyLevel = "Beginner",
-                videoUrl = "https://placeholder.com/baddha-konasana",
+                videoUrl = "file:///android_asset/videos/yoga/Baddha_Konasana.mp4",
                 description = "A seated pose that opens the hips and groin.",
                 benefits = listOf(
                     "Stretches the inner thighs, groins, and knees",
@@ -350,7 +350,7 @@ object YogaDataProvider {
                 name = "Plank Pose",
                 sanskritName = "Phalakasana",
                 difficultyLevel = "Intermediate",
-                videoUrl = "https://placeholder.com/phalakasana",
+                videoUrl = "file:///android_asset/videos/yoga/Phalakasana.mp4",
                 description = "A foundational pose that builds core strength.",
                 benefits = listOf(
                     "Strengthens arms, wrists, and spine",
@@ -382,7 +382,7 @@ object YogaDataProvider {
                 name = "Warrior II",
                 sanskritName = "Virabhadrasana II",
                 difficultyLevel = "Beginner",
-                videoUrl = "https://placeholder.com/warrior-2",
+                videoUrl = "file:///android_asset/videos/yoga/virabhadrasana.mp4",
                 description = "A powerful standing pose that builds endurance.",
                 benefits = listOf(
                     "Strengthens legs and ankles",
@@ -414,7 +414,7 @@ object YogaDataProvider {
                 name = "Chair Pose",
                 sanskritName = "Utkatasana",
                 difficultyLevel = "Intermediate",
-                videoUrl = "https://placeholder.com/utkatasana",
+                videoUrl = "file:///android_asset/videos/yoga/utkatasana.mp4",
                 description = "A powerful standing pose that strengthens the legs.",
                 benefits = listOf(
                     "Strengthens ankles, thighs, calves, and spine",

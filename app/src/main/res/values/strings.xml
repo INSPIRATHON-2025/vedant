@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Yugved</string>
+    <string name="app_name">YUGVED</string>
     
     <!-- Home Fragment Strings -->
     <string name="profile_image">Profile Image</string>
@@ -55,12 +55,19 @@
     <string name="step_3">3. Engage your thigh muscles and lift your kneecaps. Keep your arms at your sides.</string>
     
     <!-- Diet Questionnaire Strings -->
+    <string name="step_1_of_4">Step 1 of 4</string>
+    <string name="step_2_of_4">Step 2 of 4</string>
+    <string name="step_3_of_4">Step 3 of 4</string>
+    <string name="step_4_of_4">Step 4 of 4</string>
     <string name="step_1_of_3">Step 1 of 3</string>
     <string name="step_2_of_3">Step 2 of 3</string>
     <string name="step_3_of_3">Step 3 of 3</string>
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="calculate">Calculate</string>
+    
+    <string name="diet_body_metrics_title">Enter Your Details</string>
+    <string name="diet_body_metrics_subtitle">We need your body metrics to calculate personalized diet recommendations</string>
     
     <string name="activity_icon">Activity Icon</string>
     <string name="activity_level_title">What\'s your activity level?</string>

@@ -22,7 +22,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
 
     companion object {
         private const val DATABASE_NAME = "yugved.db"
-        private const val DATABASE_VERSION = 17  // Incremented for flexibility and strength yoga videos
+        private const val DATABASE_VERSION = 18  // Incremented to fix yoga video paths
         
         // Doctors table and columns
         private const val TABLE_DOCTORS = "doctors"
@@ -1314,7 +1314,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                 'Beginner',
                 'Flexibility',
                 ${com.example.yugved4.R.drawable.yoga_uttanasana},
-                'file:///android_asset/videos/yoga/flexibility/standing_forward_bend.mp4'
+                'file:///android_asset/videos/yoga/Uttanasan.mp4'
             )
         """)
 
@@ -1331,7 +1331,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                 'Beginner',
                 'Flexibility',
                 ${com.example.yugved4.R.drawable.yoga_kapotasana},
-                'file:///android_asset/videos/yoga/flexibility/pigeon_pose.mp4'
+                'file:///android_asset/videos/yoga/Kapotasana.mp4'
             )
         """)
 
@@ -1348,7 +1348,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                 'Beginner',
                 'Flexibility',
                 ${com.example.yugved4.R.drawable.yoga_baddha_konasana},
-                'file:///android_asset/videos/yoga/flexibility/butterfly_pose.mp4'
+                'file:///android_asset/videos/yoga/Baddha_Konasana.mp4'
             )
         """)
 
@@ -1367,7 +1367,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                 'Beginner',
                 'Strength',
                 ${com.example.yugved4.R.drawable.yoga_phalakasana},
-                'file:///android_asset/videos/yoga/strength/plank_pose.mp4'
+                'file:///android_asset/videos/yoga/Phalakasana.mp4'
             )
         """)
 
@@ -1384,7 +1384,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                 'Beginner',
                 'Strength',
                 ${com.example.yugved4.R.drawable.yoga_warrior_two},
-                'file:///android_asset/videos/yoga/strength/warrior_two.mp4'
+                'file:///android_asset/videos/yoga/virabhadrasana.mp4'
             )
         """)
 
@@ -1401,7 +1401,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
                 'Beginner',
                 'Strength',
                 ${com.example.yugved4.R.drawable.yoga_utkatasana},
-                'file:///android_asset/videos/yoga/strength/chair_pose.mp4'
+                'file:///android_asset/videos/yoga/utkatasana.mp4'
             )
         """)
     }
@@ -1424,10 +1424,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 1000, 1200, 'Veg',
-                'Breakfast (250 kcal): Small bowl of oats porridge with half banana, a few almonds',
-                'Lunch (400 kcal): 1 small roti, dal (1 small bowl), steamed vegetables, small portion of brown rice',
-                'Dinner (350 kcal): Vegetable soup, 1 roti, grilled paneer (50g), cucumber salad',
-                'Snacks (150 kcal): Green tea, 1 small apple, 5-6 almonds'
+                'Breakfast (250 kcal):\n• Oats porridge with milk & chia seeds\n• Half banana + 5 almonds\n• Green tea\n\n🥗 Nutrients: 8g protein, 35g carbs, 8g fat, 4g fiber\n💪 Protein: Oats, milk, almonds',
+                'Lunch (400 kcal):\n• 1 multigrain roti\n• Moong dal (1 bowl) - rich in protein\n• Paneer bhurji (40g)\n• Steamed veggies + brown rice\n• Cucumber raita\n\n🥗 Nutrients: 18g protein, 45g carbs, 12g fat, 6g fiber\n💪 Protein: Moong dal (12g), paneer (8g)',
+                'Dinner (350 kcal):\n• Vegetable clear soup\n• 1 roti + grilled tofu (60g)\n• Palak (spinach) sabzi\n• Mixed salad with lemon\n\n🥗 Nutrients: 15g protein, 30g carbs, 10g fat, 5g fiber\n💪 Protein: Tofu (10g), dal (5g)',
+                'Snacks (150 kcal):\n• Roasted chana (30g)\n• 1 small apple\n• Green tea + 4 walnuts\n\n🥗 Nutrients: 6g protein, 20g carbs, 5g fat, 3g fiber\n💪 Protein: Roasted chana'
             )
         """)
         
@@ -1437,10 +1437,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 1000, 1200, 'Non-Veg',
-                'Breakfast (250 kcal): 1 boiled egg, 1 slice whole wheat toast, black coffee',
-                'Lunch (400 kcal): Grilled chicken breast (100g), small portion quinoa, mixed greens salad',
-                'Dinner (350 kcal): Baked fish (100g), steamed broccoli, small sweet potato',
-                'Snacks (150 kcal): Greek yogurt (100g), handful of berries'
+                'Breakfast (250 kcal):\n• 2 boiled eggs (whole)\n• 1 whole wheat toast\n• Black coffee/green tea\n• Half orange\n\n🥗 Nutrients: 14g protein, 15g carbs, 10g fat, 2g fiber\n💪 Protein: Eggs (12g), bread (2g)',
+                'Lunch (400 kcal):\n• Grilled chicken breast (100g)\n• Quinoa salad (small bowl)\n• Steamed broccoli & carrots\n• Lemon herb dressing\n\n🥗 Nutrients: 32g protein, 30g carbs, 10g fat, 5g fiber\n💪 Protein: Chicken (25g), quinoa (4g)',
+                'Dinner (350 kcal):\n• Baked fish/salmon (100g)\n• Sweet potato (small)\n• Sautéed spinach & mushrooms\n• Tomato soup\n\n🥗 Nutrients: 28g protein, 25g carbs, 8g fat, 4g fiber\n💪 Protein: Fish (22g), veggies (2g)',
+                'Snacks (150 kcal):\n• Greek yogurt (100g)\n• Mixed berries\n• 5 almonds\n\n🥗 Nutrients: 12g protein, 15g carbs, 4g fat, 2g fiber\n💪 Protein: Greek yogurt (10g)'
             )
         """)
         
@@ -1452,10 +1452,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 1200, 1500, 'Veg',
-                'Breakfast (300 kcal): Oats porridge with banana, honey, and 8-10 almonds',
-                'Lunch (500 kcal): 2 small rotis, rajma/chole curry, brown rice (1 bowl), mixed vegetable salad',
-                'Dinner (450 kcal): Vegetable khichdi, curd, roasted papad, cucumber raita',
-                'Snacks (200 kcal): Sprouts salad, green tea, 1 orange'
+                'Breakfast (300 kcal):\n• Oats upma with peanuts & veggies\n• 1 glass buttermilk\n• 1 banana + 8 almonds\n\n🥗 Nutrients: 12g protein, 40g carbs, 10g fat, 5g fiber\n💪 Protein: Oats (4g), peanuts (5g), buttermilk (3g)',
+                'Lunch (500 kcal):\n• 2 multigrain rotis\n• Rajma/Chole curry (1 bowl)\n• Brown rice + mixed veg\n• Paneer tikka (50g)\n• Cucumber salad\n\n🥗 Nutrients: 22g protein, 60g carbs, 15g fat, 10g fiber\n💪 Protein: Rajma (9g), paneer (10g), rice (3g)',
+                'Dinner (450 kcal):\n• Khichdi with ghee\n• Cottage cheese (60g)\n• Palak dal\n• Roasted papad + raita\n\n🥗 Nutrients: 18g protein, 50g carbs, 12g fat, 7g fiber\n💪 Protein: Dal (8g), cottage cheese (8g)',
+                'Snacks (200 kcal):\n• Sprouts chaat\n• 1 orange + green tea\n• Roasted makhana (20g)\n\n🥗 Nutrients: 8g protein, 25g carbs, 5g fat, 4g fiber\n💪 Protein: Sprouts (6g), makhana (2g)'
             )
         """)
         
@@ -1465,10 +1465,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 1200, 1500, 'Non-Veg',
-                'Breakfast (300 kcal): 2 boiled eggs, 1 whole wheat toast, avocado (small portion)',
-                'Lunch (500 kcal): Grilled chicken (120g), quinoa bowl, roasted vegetables, olive oil dressing',
-                'Dinner (450 kcal): Fish curry, small portion rice, sautéed spinach',
-                'Snacks (200 kcal): Protein shake, apple, 10 almonds'
+                'Breakfast (300 kcal):\n• 2 boiled eggs + egg white omelette\n• 1 whole wheat toast + avocado\n• Black coffee\n\n🥗 Nutrients: 18g protein, 20g carbs, 12g fat, 3g fiber\n💪 Protein: Eggs (14g), bread (3g)',
+                'Lunch (500 kcal):\n• Grilled chicken (120g)\n• Quinoa bowl with veggies\n• Roasted vegetables\n• Olive oil + lemon dressing\n\n🥗 Nutrients: 38g protein, 35g carbs, 14g fat, 6g fiber\n💪 Protein: Chicken (30g), quinoa (5g)',
+                'Dinner (450 kcal):\n• Fish curry (100g)\n• Small portion basmati rice\n• Sautéed spinach & beans\n• Tomato rasam\n\n🥗 Nutrients: 30g protein, 40g carbs, 10g fat, 5g fiber\n💪 Protein: Fish (25g), beans (3g)',
+                'Snacks (200 kcal):\n• Whey protein shake (1 scoop)\n• 1 apple + 10 almonds\n\n🥗 Nutrients: 22g protein, 20g carbs, 6g fat, 3g fiber\n💪 Protein: Whey (20g)'
             )
         """)
         
@@ -1480,10 +1480,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 1500, 1800, 'Veg',
-                'Breakfast (400 kcal): Poha/upma with peanuts, 1 glass milk, 1 banana',
-                'Lunch (600 kcal): 3 rotis, dal makhani, paneer sabzi, brown rice, salad, curd',
-                'Dinner (500 kcal): Vegetable biryani (1 bowl), raita, papad, mixed salad',
-                'Snacks (250 kcal): Roasted chana, fruit (apple/orange), green tea, handful of nuts'
+                'Breakfast (400 kcal):\n• Poha with peanuts & curry leaves\n• 1 glass milk + banana\n• Handful of mixed nuts\n\n🥗 Nutrients: 14g protein, 55g carbs, 12g fat, 5g fiber\n💪 Protein: Milk (8g), peanuts (4g), poha (2g)',
+                'Lunch (600 kcal):\n• 3 rotis + dal makhani\n• Paneer butter masala (80g)\n• Brown rice + salad\n• Curd (1 bowl)\n\n🥗 Nutrients: 28g protein, 70g carbs, 18g fat, 10g fiber\n💪 Protein: Paneer (14g), dal (10g), curd (4g)',
+                'Dinner (500 kcal):\n• Veg biryani (1 bowl)\n• Soya chunks curry (50g)\n• Raita + papad\n• Mixed salad\n\n🥗 Nutrients: 22g protein, 55g carbs, 14g fat, 8g fiber\n💪 Protein: Soya chunks (18g), rice (4g)',
+                'Snacks (250 kcal):\n• Roasted chana (40g)\n• Fruit bowl + green tea\n• Handful of almonds & walnuts\n\n🥗 Nutrients: 10g protein, 30g carbs, 8g fat, 5g fiber\n💪 Protein: Chana (7g), nuts (3g)'
             )
         """)
         
@@ -1493,10 +1493,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 1500, 1800, 'Non-Veg',
-                'Breakfast (400 kcal): 2 eggs (scrambled), 2 slices whole grain toast, orange juice',
-                'Lunch (600 kcal): Chicken tikka (150g), brown rice, dal, mixed vegetables, salad',
-                'Dinner (500 kcal): Grilled fish/prawns, quinoa, steamed broccoli, tomato soup',
-                'Snacks (250 kcal): Whey protein shake, banana, peanut butter (1 tbsp)'
+                'Breakfast (400 kcal):\n• 3 eggs scrambled with veggies\n• 2 whole grain toast\n• Orange juice\n\n🥗 Nutrients: 22g protein, 35g carbs, 15g fat, 4g fiber\n💪 Protein: Eggs (18g), bread (4g)',
+                'Lunch (600 kcal):\n• Chicken tikka (150g)\n• Brown rice + dal\n• Mixed vegetables\n• Greek salad\n\n🥗 Nutrients: 42g protein, 50g carbs, 16g fat, 8g fiber\n💪 Protein: Chicken (38g), dal (4g)',
+                'Dinner (500 kcal):\n• Grilled prawns/fish (120g)\n• Quinoa pilaf\n• Steamed broccoli\n• Tomato soup\n\n🥗 Nutrients: 35g protein, 40g carbs, 12g fat, 6g fiber\n💪 Protein: Prawns/fish (30g), quinoa (5g)',
+                'Snacks (250 kcal):\n• Whey protein shake\n• Banana + peanut butter (1 tbsp)\n\n🥗 Nutrients: 28g protein, 25g carbs, 8g fat, 3g fiber\n💪 Protein: Whey (24g), peanut butter (4g)'
             )
         """)
         
@@ -1508,10 +1508,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 1800, 2000, 'Veg',
-                'Breakfast (450 kcal): Paratha (2), curd, pickle, 1 glass milk/chai',
-                'Lunch (650 kcal): 3 rotis, rajma/chole, paneer curry, rice, salad, buttermilk',
-                'Dinner (550 kcal): Dal, 2 rotis, mix veg sabzi, curd, salad',
-                'Snacks (300 kcal): Smoothie with fruits and nuts, roasted makhana, green tea'
+                'Breakfast (450 kcal):\n• 2 stuffed parathas + curd\n• 1 glass milk\n• Mixed nuts (15g)\n\n🥗 Nutrients: 16g protein, 55g carbs, 18g fat, 4g fiber\n💪 Protein: Curd (6g), milk (8g), nuts (2g)',
+                'Lunch (650 kcal):\n• 3 rotis + rajma/chole\n• Paneer curry (100g)\n• Jeera rice + buttermilk\n• Salad + pickle\n\n🥗 Nutrients: 32g protein, 75g carbs, 20g fat, 12g fiber\n💪 Protein: Paneer (18g), rajma (10g), curd (4g)',
+                'Dinner (550 kcal):\n• Dal fry + 2 rotis\n• Tofu stir-fry (80g)\n• Veg pulao + raita\n• Mixed salad\n\n🥗 Nutrients: 24g protein, 60g carbs, 16g fat, 9g fiber\n💪 Protein: Tofu (12g), dal (10g)',
+                'Snacks (300 kcal):\n• Fruit smoothie with nuts\n• Roasted makhana (30g)\n• Green tea\n\n🥗 Nutrients: 10g protein, 40g carbs, 10g fat, 5g fiber\n💪 Protein: Milk (4g), nuts (4g), makhana (2g)'
             )
         """)
         
@@ -1521,10 +1521,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 1800, 2000, 'Non-Veg',
-                'Breakfast (450 kcal): 3 eggs omelette, 2 toast slices, avocado, orange juice',
-                'Lunch (650 kcal): Chicken curry (150g), 2 rotis, rice, dal, salad, curd',
-                'Dinner (550 kcal): Grilled fish, sweet potato, mixed vegetables, soup',
-                'Snacks (300 kcal): Protein bar, banana, handful of mixed nuts, green tea'
+                'Breakfast (450 kcal):\n• 3 eggs omelette with cheese\n• 2 toast slices + avocado\n• Orange juice\n\n🥗 Nutrients: 26g protein, 30g carbs, 20g fat, 4g fiber\n💪 Protein: Eggs (18g), cheese (5g), bread (3g)',
+                'Lunch (650 kcal):\n• Chicken curry (150g)\n• 2 rotis + rice\n• Dal tadka + salad\n• Curd\n\n🥗 Nutrients: 45g protein, 60g carbs, 18g fat, 8g fiber\n💪 Protein: Chicken (38g), dal (5g), curd (2g)',
+                'Dinner (550 kcal):\n• Grilled salmon/fish (120g)\n• Sweet potato mash\n• Sautéed vegetables\n• Mushroom soup\n\n🥗 Nutrients: 35g protein, 45g carbs, 15g fat, 6g fiber\n💪 Protein: Fish (30g), veggies (3g)',
+                'Snacks (300 kcal):\n• Protein bar\n• Banana + almond butter\n• Green tea\n\n🥗 Nutrients: 18g protein, 35g carbs, 10g fat, 4g fiber\n💪 Protein: Protein bar (15g), almond butter (3g)'
             )
         """)
         
@@ -1536,10 +1536,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 2000, 2500, 'Veg',
-                'Breakfast (500 kcal): 2 parathas with curd, pickle, 1 glass milk, banana',
-                'Lunch (800 kcal): 4 rotis, dal makhani, paneer butter masala, rice, salad, raita, papad',
-                'Dinner (650 kcal): Vegetable pulao, dal, raita, paneer tikka, salad',
-                'Snacks (400 kcal): Smoothie bowl with fruits and nuts, sandwich, tea/coffee'
+                'Breakfast (500 kcal):\n• 2 parathas with paneer stuffing\n• Curd + pickle\n• 1 glass milk + banana\n\n🥗 Nutrients: 22g protein, 60g carbs, 18g fat, 5g fiber\n💪 Protein: Paneer (12g), curd (4g), milk (6g)',
+                'Lunch (800 kcal):\n• 4 rotis + dal makhani\n• Paneer butter masala (120g)\n• Rice + salad + raita\n• Papad\n\n🥗 Nutrients: 38g protein, 90g carbs, 28g fat, 14g fiber\n💪 Protein: Paneer (20g), dal (12g), raita (4g)',
+                'Dinner (650 kcal):\n• Veg pulao + dal\n• Soya keema (80g)\n• Paneer tikka + raita\n• Salad\n\n🥗 Nutrients: 32g protein, 70g carbs, 18g fat, 10g fiber\n💪 Protein: Soya (22g), paneer (8g), dal (4g)',
+                'Snacks (400 kcal):\n• Smoothie bowl with nuts\n• Sandwich with cheese\n• Tea/coffee\n\n🥗 Nutrients: 15g protein, 50g carbs, 15g fat, 5g fiber\n💪 Protein: Cheese (6g), milk (5g), nuts (4g)'
             )
         """)
         
@@ -1549,10 +1549,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 2000, 2500, 'Non-Veg',
-                'Breakfast (500 kcal): 3 eggs, 3 toast slices, avocado, bacon (2 strips), juice',
-                'Lunch (800 kcal): Chicken biryani (large bowl), raita, boiled eggs (2), salad',
-                'Dinner (650 kcal): Grilled chicken (200g), brown rice, mixed vegetables, dal',
-                'Snacks (400 kcal): Whey shake, peanut butter sandwich, fruits, almonds'
+                'Breakfast (500 kcal):\n• 3 whole eggs + 2 egg whites\n• 3 toast slices + avocado\n• Bacon (2 strips) + juice\n\n🥗 Nutrients: 32g protein, 35g carbs, 22g fat, 4g fiber\n💪 Protein: Eggs (24g), bacon (6g), bread (2g)',
+                'Lunch (800 kcal):\n• Chicken biryani (large)\n• 2 boiled eggs + raita\n• Salad\n\n🥗 Nutrients: 52g protein, 80g carbs, 25g fat, 6g fiber\n💪 Protein: Chicken (35g), eggs (12g), rice (5g)',
+                'Dinner (650 kcal):\n• Grilled chicken breast (200g)\n• Brown rice + dal\n• Sautéed vegetables\n\n🥗 Nutrients: 48g protein, 55g carbs, 18g fat, 7g fiber\n💪 Protein: Chicken (42g), dal (5g)',
+                'Snacks (400 kcal):\n• Whey protein shake\n• Peanut butter sandwich\n• Fruits + almonds\n\n🥗 Nutrients: 30g protein, 45g carbs, 12g fat, 5g fiber\n💪 Protein: Whey (24g), peanut butter (4g)'
             )
         """)
         
@@ -1564,10 +1564,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 2500, 3000, 'Veg',
-                'Breakfast (600 kcal): 3 parathas, curd, paneer bhurji, milk, fruits',
-                'Lunch (950 kcal): 5 rotis, chole/rajma, paneer curry, rice (2 bowls), salad, raita, dessert',
-                'Dinner (750 kcal): Dal makhani, 3 rotis, veg pulao, paneer tikka, salad, curd',
-                'Snacks (500 kcal): Dry fruits smoothie, sandwich, pakoras, tea, fruits'
+                'Breakfast (600 kcal):\n• 3 parathas + paneer bhurji (80g)\n• Curd + milk + fruits\n• Mixed dry fruits (30g)\n\n🥗 Nutrients: 28g protein, 70g carbs, 22g fat, 6g fiber\n💪 Protein: Paneer (14g), milk (8g), curd (4g)',
+                'Lunch (950 kcal):\n• 5 rotis + chole/rajma\n• Paneer curry (150g)\n• Rice (2 bowls) + salad\n• Raita + sweet dish\n\n🥗 Nutrients: 48g protein, 120g carbs, 30g fat, 16g fiber\n💪 Protein: Paneer (26g), legumes (15g), rice (5g)',
+                'Dinner (750 kcal):\n• Dal makhani + 3 rotis\n• Soya chunks curry (100g)\n• Veg pulao + paneer tikka\n• Salad + curd\n\n🥗 Nutrients: 38g protein, 85g carbs, 22g fat, 12g fiber\n💪 Protein: Soya (26g), dal (8g), paneer (4g)',
+                'Snacks (500 kcal):\n• Dry fruits smoothie\n• Cheese sandwich + pakoras\n• Tea + fruits\n\n🥗 Nutrients: 18g protein, 60g carbs, 20g fat, 6g fiber\n💪 Protein: Cheese (8g), milk (6g), nuts (4g)'
             )
         """)
         
@@ -1577,10 +1577,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 2500, 3000, 'Non-Veg',
-                'Breakfast (600 kcal): 4 eggs, 3 toast, bacon, avocado, protein shake',
-                'Lunch (950 kcal): Chicken curry (250g), 3 rotis, rice (2 bowls), dal, eggs, salad',
-                'Dinner (750 kcal): Grilled fish/chicken (250g), pasta, vegetables, soup',
-                'Snacks (500 kcal): Mass gainer shake, chicken sandwich, fruits, nuts, protein bar'
+                'Breakfast (600 kcal):\n• 4 eggs (scrambled with cheese)\n• 3 toast + avocado\n• Protein shake + juice\n\n🥗 Nutrients: 38g protein, 40g carbs, 28g fat, 5g fiber\n💪 Protein: Eggs (24g), whey (10g), cheese (4g)',
+                'Lunch (950 kcal):\n• Chicken curry (250g)\n• 3 rotis + rice (2 bowls)\n• Dal + eggs (2)\n• Salad\n\n🥗 Nutrients: 65g protein, 100g carbs, 28g fat, 10g fiber\n💪 Protein: Chicken (50g), eggs (12g), dal (3g)',
+                'Dinner (750 kcal):\n• Grilled fish/chicken (250g)\n• Pasta with veggies\n• Mushroom soup\n\n🥗 Nutrients: 55g protein, 65g carbs, 22g fat, 8g fiber\n💪 Protein: Fish/chicken (48g), pasta (5g)',
+                'Snacks (500 kcal):\n• Mass gainer shake\n• Chicken sandwich\n• Fruits + nuts + protein bar\n\n🥗 Nutrients: 35g protein, 55g carbs, 15g fat, 5g fiber\n💪 Protein: Mass gainer (20g), chicken (10g), bar (5g)'
             )
         """)
         
@@ -1592,10 +1592,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 3000, 4000, 'Veg',
-                'Breakfast (750 kcal): 4 parathas, paneer bhurji, curd, milk, dry fruits, banana',
-                'Lunch (1200 kcal): 6 rotis, rajma/chole, paneer butter masala, rice (3 bowls), salad, raita, sweet dish',
-                'Dinner (900 kcal): Veg biryani (large), dal makhani, paneer tikka, raita, salad, dessert',
-                'Snacks (700 kcal): Mass gainer shake, sandwich, pakoras, dry fruits, smoothie, tea'
+                'Breakfast (750 kcal):\n• 4 parathas + paneer bhurji (100g)\n• Curd + milk + dry fruits\n• Banana + mixed nuts (40g)\n\n🥗 Nutrients: 35g protein, 85g carbs, 28g fat, 7g fiber\n💪 Protein: Paneer (18g), milk (8g), curd (5g), nuts (4g)',
+                'Lunch (1200 kcal):\n• 6 rotis + rajma/chole\n• Paneer butter masala (200g)\n• Rice (3 bowls) + salad\n• Raita + sweet dish\n\n🥗 Nutrients: 58g protein, 150g carbs, 40g fat, 20g fiber\n💪 Protein: Paneer (34g), legumes (18g), rice (6g)',
+                'Dinner (900 kcal):\n• Veg biryani (large)\n• Soya chunks curry (120g)\n• Dal makhani + paneer tikka\n• Raita + salad + dessert\n\n🥗 Nutrients: 48g protein, 100g carbs, 28g fat, 14g fiber\n💪 Protein: Soya (32g), paneer (10g), dal (6g)',
+                'Snacks (700 kcal):\n• Mass gainer shake with nuts\n• Sandwich + pakoras\n• Dry fruits + smoothie + tea\n\n🥗 Nutrients: 28g protein, 85g carbs, 25g fat, 8g fiber\n💪 Protein: Mass gainer (18g), nuts (6g), milk (4g)'
             )
         """)
         
@@ -1605,10 +1605,10 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
             ($COLUMN_MIN_CALORIES, $COLUMN_MAX_CALORIES, $COLUMN_DIET_TYPE, $COLUMN_BREAKFAST, $COLUMN_LUNCH, $COLUMN_DINNER, $COLUMN_SNACKS) 
             VALUES (
                 3000, 4000, 'Non-Veg',
-                'Breakfast (750 kcal): 5 eggs, 4 toast, bacon, cheese, avocado, protein shake, juice',
-                'Lunch (1200 kcal): Chicken biryani (xl), 3 boiled eggs, chicken tikka, raita, salad',
-                'Dinner (900 kcal): Grilled chicken/fish (300g), rice (2 bowls), pasta, vegetables, soup',
-                'Snacks (700 kcal): Mass gainer shake (2), chicken sandwich, fruits, nuts, protein bars (2)'
+                'Breakfast (750 kcal):\n• 5 eggs (whole) + cheese\n• 4 toast + avocado + bacon\n• Protein shake + juice\n\n🥗 Nutrients: 48g protein, 50g carbs, 35g fat, 6g fiber\n💪 Protein: Eggs (30g), whey (12g), cheese (4g), bacon (2g)',
+                'Lunch (1200 kcal):\n• Chicken biryani (XL)\n• 3 boiled eggs + chicken tikka (100g)\n• Raita + salad\n\n🥗 Nutrients: 78g protein, 110g carbs, 38g fat, 8g fiber\n💪 Protein: Chicken (50g), eggs (18g), rice (10g)',
+                'Dinner (900 kcal):\n• Grilled chicken/fish (300g)\n• Rice (2 bowls) + pasta\n• Vegetables + soup\n\n🥗 Nutrients: 68g protein, 85g carbs, 25g fat, 10g fiber\n💪 Protein: Chicken/fish (60g), pasta (6g)',
+                'Snacks (700 kcal):\n• Mass gainer shake (2 scoops)\n• Chicken sandwich\n• Fruits + nuts + protein bars (2)\n\n🥗 Nutrients: 55g protein, 75g carbs, 22g fat, 6g fiber\n💪 Protein: Mass gainer (30g), sandwich (12g), bars (13g)'
             )
         """)
     }
@@ -2071,6 +2071,33 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
             .format(java.util.Date())
         return getStepCount(today)
+    }
+    
+    /**
+     * Get all step history records from the database
+     * Returns a list of StepHistory objects sorted by date in descending order
+     * (most recent days appear first)
+     * @return List of StepHistory objects
+     */
+    fun getAllStepHistory(): List<com.example.yugved4.models.StepHistory> {
+        val stepHistoryList = mutableListOf<com.example.yugved4.models.StepHistory>()
+        val db = readableDatabase
+        
+        db.rawQuery(
+            "SELECT * FROM $TABLE_DAILY_STEPS ORDER BY $COLUMN_STEP_DATE DESC",
+            null
+        ).use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    val date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STEP_DATE))
+                    val steps = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STEP_COUNT))
+                    stepHistoryList.add(com.example.yugved4.models.StepHistory(date, steps))
+                } while (cursor.moveToNext())
+            }
+        }
+        
+        db.close()
+        return stepHistoryList
     }
     
     // =============== FIREBASE & AUTHENTICATION METHODS ===============

@@ -21,7 +21,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Steps"
+                android:text="Steps Tracking"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -87,8 +87,8 @@
                     app:indicatorColor="@color/emerald_green"
                     app:indicatorSize="200dp"
                     app:trackColor="@color/progress_gray"
-                    app:trackThickness="16dp"
-                    app:trackCornerRadius="8dp" />
+                    app:trackCornerRadius="8dp"
+                    app:trackThickness="16dp" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -290,6 +290,42 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:visibility="gone" />
+
+        <!-- Previous Steps History Section -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/gray_700" />
+
+        <TextView
+            android:id="@+id/tvPreviousStepsHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📅 Previous Steps"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/tvNoHistoryMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start walking to build your step history!"
+            android:textColor="@color/gray_600"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvStepHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="24dp" />
 
     </LinearLayout>
 

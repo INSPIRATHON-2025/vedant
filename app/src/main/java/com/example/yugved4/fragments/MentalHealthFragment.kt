@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yugved4.R
@@ -19,6 +20,7 @@ import com.example.yugved4.utils.AuthHelper
 import com.example.yugved4.database.DatabaseHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.android.material.textfield.TextInputEditText
@@ -36,6 +38,7 @@ class MentalHealthFragment : Fragment() {
     // UI Components
     private lateinit var toggleGroupMusic: MaterialButtonToggleGroup
     private lateinit var btnToggleAudio: MaterialButton
+    private lateinit var cardMyDoctors: MaterialCardView
     
     // Default to white_noise (will need actual resource when audio files are added)
     private var selectedMusicResId: Int = 0 // Will be R.raw.white_noise when available
@@ -71,6 +74,7 @@ class MentalHealthFragment : Fragment() {
         // Initialize views
         toggleGroupMusic = view.findViewById(R.id.toggleGroupMusic)
         btnToggleAudio = view.findViewById(R.id.btnToggleAudio)
+        cardMyDoctors = view.findViewById(R.id.cardMyDoctors)
         btnMood1 = view.findViewById(R.id.btnMood1)
         btnMood2 = view.findViewById(R.id.btnMood2)
         btnMood3 = view.findViewById(R.id.btnMood3)
@@ -89,6 +93,11 @@ class MentalHealthFragment : Fragment() {
             showJournalHistory()
         }
         
+        // Setup My Doctors card click listener
+        cardMyDoctors.setOnClickListener {
+            navigateToDoctors()
+        }
+        
         // Initialize RecyclerView
         rvHelplines = view.findViewById(R.id.rvHelplines)
         setupRecyclerView()
@@ -105,6 +114,17 @@ class MentalHealthFragment : Fragment() {
         setupAudioPlayer()
 
         return view
+    }
+    
+    /**
+     * Navigate to the Doctors Fragment
+     */
+    private fun navigateToDoctors() {
+        try {
+            findNavController().navigate(R.id.doctorFragment)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Unable to open Doctors", Toast.LENGTH_SHORT).show()
+        }
     }
     
 

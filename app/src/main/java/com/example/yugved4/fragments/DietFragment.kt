@@ -17,6 +17,10 @@ import com.google.android.material.textfield.TextInputEditText
 
 /**
  * Diet Fragment with multi-step questionnaire using ViewPager2
+ * Step 1: Body Metrics (Age, Gender, Height, Weight)
+ * Step 2: Activity Level
+ * Step 3: Fitness Goal
+ * Step 4: Diet Preference
  */
 class DietFragment : Fragment() {
 
@@ -28,22 +32,35 @@ class DietFragment : Fragment() {
     private lateinit var prefsManager: DietPreferencesManager
     private lateinit var dbHelper: DatabaseHelper
     
-    // Step 1 views - Activity Level
+    // Step 1 views - Body Metrics
+    private var etDietAge: TextInputEditText? = null
+    private var rgDietGender: RadioGroup? = null
+    private var rbDietMale: RadioButton? = null
+    private var rbDietFemale: RadioButton? = null
+    private var etDietHeight: TextInputEditText? = null
+    private var etDietWeight: TextInputEditText? = null
+    private var inputAge: Int = 0
+    private var inputGender: String = ""
+    private var inputHeight: Int = 0
+    private var inputWeight: Float = 0f
+    
+    // Step 2 views - Activity Level
     private var actvActivityLevel: AutoCompleteTextView? = null
     private var selectedActivityLevel: String = ""
     
-    // Step 2 views - Fitness Goal
+    // Step 3 views - Fitness Goal
     private var cardWeightLoss: MaterialCardView? = null
     private var cardMaintainWeight: MaterialCardView? = null
     private var cardWeightGain: MaterialCardView? = null
     private var selectedFitnessGoal: String = ""
     
-    // Step 3 views - Diet Preference
+    // Step 4 views - Diet Preference
     private var cardVegetarian: MaterialCardView? = null
     private var cardNonVeg: MaterialCardView? = null
     private var selectedDietPreference: String = ""
     
     private var currentStep = 0
+    private val totalSteps = 4
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,6 +86,7 @@ class DietFragment : Fragment() {
     private fun setupViewPager() {
         // Create the 4 step views
         val stepViews = listOf(
+            createBodyMetricsView(),
             createActivityLevelView(),
             createFitnessGoalView(),
             createDietPreferenceView()
@@ -81,7 +99,7 @@ class DietFragment : Fragment() {
             
             override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {}
             
-            override fun getItemCount(): Int = 3
+            override fun getItemCount(): Int = totalSteps
             
             override fun getItemViewType(position: Int): Int = position
         }
@@ -95,6 +113,19 @@ class DietFragment : Fragment() {
                 updateUI()
             }
         })
+    }
+
+    private fun createBodyMetricsView(): View {
+        val view = layoutInflater.inflate(R.layout.step_diet_body_metrics, viewPager, false)
+        
+        etDietAge = view.findViewById(R.id.etDietAge)
+        rgDietGender = view.findViewById(R.id.rgDietGender)
+        rbDietMale = view.findViewById(R.id.rbDietMale)
+        rbDietFemale = view.findViewById(R.id.rbDietFemale)
+        etDietHeight = view.findViewById(R.id.etDietHeight)
+        etDietWeight = view.findViewById(R.id.etDietWeight)
+        
+        return view
     }
 
     private fun createActivityLevelView(): View {
@@ -190,7 +221,7 @@ class DietFragment : Fragment() {
         
         btnNext.setOnClickListener {
             if (validateCurrentStep()) {
-                if (currentStep < 2) {
+                if (currentStep < totalSteps - 1) {
                     viewPager.currentItem = currentStep + 1
                 } else {
                     // Calculate and navigate to result
@@ -205,32 +236,34 @@ class DietFragment : Fragment() {
     private fun updateUI() {
         // Update step indicator
         tvStepIndicator.text = when (currentStep) {
-            0 -> "Step 1 of 3"
-            1 -> "Step 2 of 3"
-            2 -> "Step 3 of 3"
+            0 -> getString(R.string.step_1_of_4)
+            1 -> getString(R.string.step_2_of_4)
+            2 -> getString(R.string.step_3_of_4)
+            3 -> getString(R.string.step_4_of_4)
             else -> ""
         }
         
         // Update button visibility and text
         btnPrevious.visibility = if (currentStep > 0) View.VISIBLE else View.GONE
-        btnNext.text = if (currentStep == 2) getString(R.string.calculate) else getString(R.string.next)
+        btnNext.text = if (currentStep == totalSteps - 1) getString(R.string.calculate) else getString(R.string.next)
     }
 
     private fun validateCurrentStep(): Boolean {
         return when (currentStep) {
-            0 -> {
+            0 -> validateBodyMetrics()
+            1 -> {
                 if (selectedActivityLevel.isEmpty()) {
                     Toast.makeText(requireContext(), "Please select your activity level", Toast.LENGTH_SHORT).show()
                     false
                 } else true
             }
-            1 -> {
+            2 -> {
                 if (selectedFitnessGoal.isEmpty()) {
                     Toast.makeText(requireContext(), "Please select your fitness goal", Toast.LENGTH_SHORT).show()
                     false
                 } else true
             }
-            2 -> {
+            3 -> {
                 if (selectedDietPreference.isEmpty()) {
                     Toast.makeText(requireContext(), "Please select your dietary preference", Toast.LENGTH_SHORT).show()
                     false
@@ -240,19 +273,65 @@ class DietFragment : Fragment() {
         }
     }
 
-    private fun calculateAndNavigate() {
-        // Fetch user profile from database
-        val userProfile = dbHelper.getUserProfile()
+    private fun validateBodyMetrics(): Boolean {
+        val ageText = etDietAge?.text?.toString()?.trim() ?: ""
+        val heightText = etDietHeight?.text?.toString()?.trim() ?: ""
+        val weightText = etDietWeight?.text?.toString()?.trim() ?: ""
         
-        if (userProfile == null) {
-            Toast.makeText(requireContext(), "User profile not found. Please complete profile in Home.", Toast.LENGTH_LONG).show()
-            return
+        // Validate age
+        if (ageText.isEmpty()) {
+            Toast.makeText(requireContext(), getString(R.string.please_enter_age), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        val age = ageText.toIntOrNull()
+        if (age == null || age < 10 || age > 120) {
+            Toast.makeText(requireContext(), getString(R.string.invalid_age), Toast.LENGTH_SHORT).show()
+            return false
         }
         
-        val age = userProfile.age ?: 30
-        val gender = userProfile.gender ?: "Male"
-        val height = userProfile.height?.toInt() ?: 170
-        val weight = userProfile.currentWeight.toFloat()
+        // Validate gender
+        if (rgDietGender?.checkedRadioButtonId == -1) {
+            Toast.makeText(requireContext(), getString(R.string.please_select_gender), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        
+        // Validate height
+        if (heightText.isEmpty()) {
+            Toast.makeText(requireContext(), getString(R.string.please_enter_height), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        val height = heightText.toIntOrNull()
+        if (height == null || height < 100 || height > 250) {
+            Toast.makeText(requireContext(), getString(R.string.invalid_height), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        
+        // Validate weight
+        if (weightText.isEmpty()) {
+            Toast.makeText(requireContext(), getString(R.string.please_enter_weight), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        val weight = weightText.toFloatOrNull()
+        if (weight == null || weight < 30 || weight > 200) {
+            Toast.makeText(requireContext(), getString(R.string.invalid_weight), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        
+        // Store validated values
+        inputAge = age
+        inputGender = if (rbDietMale?.isChecked == true) "Male" else "Female"
+        inputHeight = height
+        inputWeight = weight
+        
+        return true
+    }
+
+    private fun calculateAndNavigate() {
+        // Use the input values from body metrics step instead of profile
+        val age = inputAge
+        val gender = inputGender
+        val height = inputHeight
+        val weight = inputWeight
         
         val calories = calculateCalories(age, gender, height, weight, selectedActivityLevel)
         
@@ -311,3 +390,4 @@ class DietFragment : Fragment() {
         }
     }
 }
+

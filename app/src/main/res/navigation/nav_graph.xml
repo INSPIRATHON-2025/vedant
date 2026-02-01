@@ -88,11 +88,17 @@
             app:argType="string" />
     </fragment>
 
+
     <fragment
         android:id="@+id/mentalHealthFragment"
         android:name="com.example.yugved4.fragments.MentalHealthFragment"
         android:label="Mental Health"
-        tools:layout="@layout/fragment_mental_health" />
+        tools:layout="@layout/fragment_mental_health">
+        
+        <action
+            android:id="@+id/action_mentalHealthFragment_to_doctorFragment"
+            app:destination="@id/doctorFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/doctorFragment"
@@ -106,7 +112,7 @@
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
 
-    <!-- Gym Categories Fragment (Step 1: Muscle Group Selection) -->
+    <!-- Gym Categories Fragment (Top-level destination for Gym tab) -->
     <fragment
         android:id="@+id/gymCategoriesFragment"
         android:name="com.example.yugved4.fragments.GymCategoriesFragment"
@@ -190,11 +196,11 @@
         android:label="Diet Results"
         tools:layout="@layout/fragment_diet_result" />
     
-    <!-- Yoga Categories Fragment -->
+    <!-- Yoga Categories Fragment (Top-level destination for Yoga tab) -->
     <fragment
         android:id="@+id/yogaFragment"
         android:name="com.example.yugved4.fragments.YogaFragment"
-        android:label="Yoga Categories"
+        android:label="Yoga"
         tools:layout="@layout/fragment_yoga">
         
         <action
