@@ -1,15 +1,19 @@
 package com.example.yugved4.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.yugved4.LoginActivity
 import com.example.yugved4.R
 import com.example.yugved4.database.DatabaseHelper
 import com.example.yugved4.databinding.BottomSheetProfileBinding
+import com.example.yugved4.utils.AuthHelper
 import com.example.yugved4.utils.ThemeHelper
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
@@ -44,6 +48,7 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
         
         loadUserProfile()
         setupThemeToggle()
+        setupLogout()
     }
     
     /**
@@ -156,6 +161,65 @@ class ProfileBottomSheet : BottomSheetDialogFragment() {
                 val message = if (isChecked) "Dark mode enabled" else "Light mode enabled"
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+    
+    /**
+     * Setup logout button click listener
+     */
+    private fun setupLogout() {
+        binding.btnLogout.setOnClickListener {
+            showLogoutConfirmation()
+        }
+    }
+    
+    /**
+     * Show confirmation dialog before logging out
+     */
+    private fun showLogoutConfirmation() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Logout")
+            .setMessage("Are you sure you want to logout? You will need to sign in again to access the app.")
+            .setPositiveButton("Logout") { _, _ ->
+                performLogout()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    /**
+     * Perform logout - sign out from Firebase and clear local data
+     */
+    private fun performLogout() {
+        try {
+            // Sign out from Firebase
+            AuthHelper.signOut()
+            
+            // Clear local user profile data
+            dbHelper.clearUserProfile()
+            
+            Toast.makeText(
+                requireContext(),
+                "Logged out successfully",
+                Toast.LENGTH_SHORT
+            ).show()
+            
+            // Dismiss bottom sheet
+            dismiss()
+            
+            // Navigate to LoginActivity and clear the back stack
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            
+            // Finish current activity
+            requireActivity().finish()
+        } catch (e: Exception) {
+            Toast.makeText(
+                requireContext(),
+                "Error logging out: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

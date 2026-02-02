@@ -595,6 +595,17 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
     }
     
     /**
+     * Clear user profile from database (used during logout)
+     * @return number of rows deleted
+     */
+    fun clearUserProfile(): Int {
+        val db = writableDatabase
+        val rowsDeleted = db.delete(TABLE_USER_PROFILE, null, null)
+        db.close()
+        return rowsDeleted
+    }
+    
+    /**
      * Load user profile from Firestore to local database
      * Used when app is reinstalled and local database is empty
      * @return true if profile was loaded successfully, false otherwise

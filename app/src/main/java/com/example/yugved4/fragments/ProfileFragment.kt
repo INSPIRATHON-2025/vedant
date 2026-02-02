@@ -1,16 +1,21 @@
 package com.example.yugved4.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.example.yugved4.LoginActivity
 import com.example.yugved4.R
 import com.example.yugved4.database.DatabaseHelper
+import com.example.yugved4.utils.AuthHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+
 
 /**
  * Profile Fragment for viewing and editing user profile
@@ -31,8 +36,9 @@ class ProfileFragment : Fragment() {
     private lateinit var tvDietPreferenceValue: TextView
     private lateinit var tvTargetCaloriesValue: TextView
     
-    // Save button
+    // Buttons
     private lateinit var btnSaveProfile: MaterialButton
+    private lateinit var btnLogout: MaterialButton
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,6 +60,11 @@ class ProfileFragment : Fragment() {
             saveProfile()
         }
         
+        // Set up logout button
+        btnLogout.setOnClickListener {
+            showLogoutConfirmation()
+        }
+        
         return view
     }
     
@@ -70,8 +81,9 @@ class ProfileFragment : Fragment() {
         tvDietPreferenceValue = view.findViewById(R.id.tvDietPreferenceValue)
         tvTargetCaloriesValue = view.findViewById(R.id.tvTargetCaloriesValue)
         
-        // Button
+        // Buttons
         btnSaveProfile = view.findViewById(R.id.btnSaveProfile)
+        btnLogout = view.findViewById(R.id.btnLogout)
     }
     
     /**
@@ -204,6 +216,53 @@ class ProfileFragment : Fragment() {
             Toast.makeText(
                 requireContext(),
                 "Error: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+    
+    /**
+     * Show confirmation dialog before logging out
+     */
+    private fun showLogoutConfirmation() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Logout")
+            .setMessage("Are you sure you want to logout? You will need to sign in again to access the app.")
+            .setPositiveButton("Logout") { _, _ ->
+                performLogout()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    /**
+     * Perform logout - sign out from Firebase and clear local data
+     */
+    private fun performLogout() {
+        try {
+            // Sign out from Firebase
+            AuthHelper.signOut()
+            
+            // Clear local user profile data
+            databaseHelper.clearUserProfile()
+            
+            Toast.makeText(
+                requireContext(),
+                "Logged out successfully",
+                Toast.LENGTH_SHORT
+            ).show()
+            
+            // Navigate to LoginActivity and clear the back stack
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            
+            // Finish current activity
+            requireActivity().finish()
+        } catch (e: Exception) {
+            Toast.makeText(
+                requireContext(),
+                "Error logging out: ${e.message}",
                 Toast.LENGTH_SHORT
             ).show()
         }
